@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
 import menuBg from "@/assets/menu-bg.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
@@ -23,6 +24,19 @@ const buttons = [
 ];
 
 function MainMenu() {
+  // Tenta travar em paisagem (só funciona em tela cheia em navegadores compatíveis)
+  useEffect(() => {
+    const lock = async () => {
+      try {
+        if (!document.fullscreenElement) await document.documentElement.requestFullscreen?.();
+        await (screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> }).lock?.("landscape");
+      } catch {
+        /* sem suporte: o aviso de girar cobre esse caso */
+      }
+    };
+    window.addEventListener("pointerdown", lock, { once: true });
+    return () => window.removeEventListener("pointerdown", lock);
+  }, []);
   return (
     <main className="game-root" lang="pt-BR">
       <div className="game-stage">
@@ -41,7 +55,7 @@ function MainMenu() {
 
       <div className="rotate-overlay" role="alert">
         <div className="rotate-phone" aria-hidden="true" />
-        <p>VIRE O CELULAR PARA JOGAR</p>
+        <p>Vire o celular para jogar.</p>
       </div>
     </main>
   );
