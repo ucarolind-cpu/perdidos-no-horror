@@ -1,6 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import menuBg from "@/assets/menu-bg.jpg.asset.json";
+import { GameShell } from "@/game/GameShell";
+import { playClick } from "@/game/audio";
+import { vibrate } from "@/game/settings";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -16,47 +18,21 @@ export const Route = createFileRoute("/")({
   component: MainMenu,
 });
 
-// Hotspots alinhados aos botões desenhados na imagem de referência (em % da imagem)
-const buttons = [
-  { label: "JOGAR", left: 35.8, top: 43.6, width: 28.5, height: 14.7 },
-  { label: "CONFIGURAÇÕES", left: 36.8, top: 61.5, width: 26.2, height: 12.1 },
-  { label: "SAIR", left: 36.8, top: 76.4, width: 26.2, height: 12.1 },
-];
+const pos = (left: number, top: number, width: number, height: number) => ({
+  left: `${left}%`, top: `${top}%`, width: `${width}%`, height: `${height}%`,
+});
+const tap = () => { playClick(); vibrate(20); };
 
 function MainMenu() {
-  // Tenta travar em paisagem (só funciona em tela cheia em navegadores compatíveis)
-  useEffect(() => {
-    const lock = async () => {
-      try {
-        if (!document.fullscreenElement) await document.documentElement.requestFullscreen?.();
-        await (screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> }).lock?.("landscape");
-      } catch {
-        /* sem suporte: o aviso de girar cobre esse caso */
-      }
-    };
-    window.addEventListener("pointerdown", lock, { once: true });
-    return () => window.removeEventListener("pointerdown", lock);
-  }, []);
   return (
-    <main className="game-root" lang="pt-BR">
+    <GameShell>
       <div className="game-stage">
         <img src={menuBg.url} alt="Perdidos no Horror" className="game-bg" draggable={false} />
         <h1 className="sr-only">PERDIDOS NO HORROR</h1>
-        {buttons.map((b) => (
-          <button
-            key={b.label}
-            type="button"
-            aria-label={b.label}
-            className="menu-hotspot"
-            style={{ left: `${b.left}%`, top: `${b.top}%`, width: `${b.width}%`, height: `${b.height}%` }}
-          />
-        ))}
+        <button type="button" aria-label="JOGAR" className="menu-hotspot" style={pos(35.8, 43.6, 28.5, 14.7)} onClick={tap} />
+        <Link to="/configuracoes" aria-label="CONFIGURAÇÕES" className="menu-hotspot" style={pos(36.8, 61.5, 26.2, 12.1)} onClick={tap} />
+        <button type="button" aria-label="SAIR" className="menu-hotspot" style={pos(36.8, 76.4, 26.2, 12.1)} onClick={tap} />
       </div>
-
-      <div className="rotate-overlay" role="alert">
-        <div className="rotate-phone" aria-hidden="true" />
-        <p>Vire o celular para jogar.</p>
-      </div>
-    </main>
+    </GameShell>
   );
 }
