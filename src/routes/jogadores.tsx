@@ -36,10 +36,15 @@ function PlayerCount() {
       <div className="game-stage">
         <img src={bg.url} alt="" className="game-bg" draggable={false} />
         <h1 className="sr-only">QUANTIDADE DE JOGADORES</h1>
-        {options.map((o) => (
-          <button type="button" key={o.n} aria-label={o.label}
-            className="menu-hotspot" style={pos(36.9, o.top, 26.3, 11.2)} onClick={tap} />
-        ))}
+        {options.map((o) =>
+          o.n === 1 ? (
+            <button type="button" key={o.n} aria-label={o.label}
+              className="menu-hotspot" style={pos(36.9, o.top, 26.3, 11.2)} onClick={tap} />
+          ) : (
+            <Link to="/multijogador" key={o.n} aria-label={o.label}
+              className="menu-hotspot" style={pos(36.9, o.top, 26.3, 11.2)} onClick={tap} />
+          ),
+        )}
         <Link to="/" aria-label="VOLTAR" className="menu-hotspot" style={pos(3.3, 87, 15.8, 9.1)} onClick={tap} />
       </div>
     </GameShell>

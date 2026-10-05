@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as JogadoresRouteImport } from './routes/jogadores'
+import { Route as MultijogadorRouteImport } from './routes/multijogador'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,44 @@ const JogadoresRoute = JogadoresRouteImport.update({
   path: '/jogadores',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MultijogadorRoute = MultijogadorRouteImport.update({
+  id: '/multijogador',
+  path: '/multijogador',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/jogadores': typeof JogadoresRoute
+  '/multijogador': typeof MultijogadorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/jogadores': typeof JogadoresRoute
+  '/multijogador': typeof MultijogadorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/jogadores': typeof JogadoresRoute
+  '/multijogador': typeof MultijogadorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/configuracoes' | '/jogadores'
+  fullPaths: '/' | '/configuracoes' | '/jogadores' | '/multijogador'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/configuracoes' | '/jogadores'
-  id: '__root__' | '/' | '/configuracoes' | '/jogadores'
+  to: '/' | '/configuracoes' | '/jogadores' | '/multijogador'
+  id: '__root__' | '/' | '/configuracoes' | '/jogadores' | '/multijogador'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConfiguracoesRoute: typeof ConfiguracoesRoute
   JogadoresRoute: typeof JogadoresRoute
+  MultijogadorRoute: typeof MultijogadorRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JogadoresRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/multijogador': {
+      id: '/multijogador'
+      path: '/multijogador'
+      fullPath: '/multijogador'
+      preLoaderRoute: typeof MultijogadorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConfiguracoesRoute: ConfiguracoesRoute,
   JogadoresRoute: JogadoresRoute,
+  MultijogadorRoute: MultijogadorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
