@@ -37,9 +37,9 @@ function Slider({ k, label, low = "0%", high = "100%", showValue = true }: { k: 
           onPointerUp={tap}
         />
         <div className="set-scale">
-          <span>{low}</span>
+          <span style={{ visibility: showValue && v < 10 ? "hidden" : "visible" }}>{low}</span>
           {showValue && <span className="set-value" style={{ left: `${v}%` }}>{v}%</span>}
-          <span>{high}</span>
+          <span style={{ visibility: showValue && v > 88 ? "hidden" : "visible" }}>{high}</span>
         </div>
       </div>
     </div>

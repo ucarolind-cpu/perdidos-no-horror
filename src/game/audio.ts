@@ -50,7 +50,7 @@ function startProceduralMusic() {
     const o = c.createOscillator();
     const g = c.createGain();
     o.type = "sine";
-    o.frequency.value = notes[Math.floor(Math.random() * notes.length)];
+    o.frequency.value = notes[Math.floor(Math.random() * notes.length)] ?? 220;
     const t = c.currentTime;
     g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime(0.08, t + 1.5);
