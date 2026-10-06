@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as JogadoresRouteImport } from './routes/jogadores'
 import { Route as MultijogadorRouteImport } from './routes/multijogador'
+import { Route as SalaEsperaRouteImport } from './routes/sala-espera'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const MultijogadorRoute = MultijogadorRouteImport.update({
   path: '/multijogador',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SalaEsperaRoute = SalaEsperaRouteImport.update({
+  id: '/sala-espera',
+  path: '/sala-espera',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/jogadores': typeof JogadoresRoute
   '/multijogador': typeof MultijogadorRoute
+  '/sala-espera': typeof SalaEsperaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/jogadores': typeof JogadoresRoute
   '/multijogador': typeof MultijogadorRoute
+  '/sala-espera': typeof SalaEsperaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,21 @@ export interface FileRoutesById {
   '/configuracoes': typeof ConfiguracoesRoute
   '/jogadores': typeof JogadoresRoute
   '/multijogador': typeof MultijogadorRoute
+  '/sala-espera': typeof SalaEsperaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/configuracoes' | '/jogadores' | '/multijogador'
+  fullPaths:
+    '/' | '/configuracoes' | '/jogadores' | '/multijogador' | '/sala-espera'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/configuracoes' | '/jogadores' | '/multijogador'
-  id: '__root__' | '/' | '/configuracoes' | '/jogadores' | '/multijogador'
+  to: '/' | '/configuracoes' | '/jogadores' | '/multijogador' | '/sala-espera'
+  id:
+    | '__root__'
+    | '/'
+    | '/configuracoes'
+    | '/jogadores'
+    | '/multijogador'
+    | '/sala-espera'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +83,7 @@ export interface RootRouteChildren {
   ConfiguracoesRoute: typeof ConfiguracoesRoute
   JogadoresRoute: typeof JogadoresRoute
   MultijogadorRoute: typeof MultijogadorRoute
+  SalaEsperaRoute: typeof SalaEsperaRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +116,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MultijogadorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sala-espera': {
+      id: '/sala-espera'
+      path: '/sala-espera'
+      fullPath: '/sala-espera'
+      preLoaderRoute: typeof SalaEsperaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +131,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConfiguracoesRoute: ConfiguracoesRoute,
   JogadoresRoute: JogadoresRoute,
   MultijogadorRoute: MultijogadorRoute,
+  SalaEsperaRoute: SalaEsperaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

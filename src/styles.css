@@ -273,3 +273,36 @@ input.wood-field { width: 100%; text-align: center; outline: none; border-color:
   box-shadow: 0 6px 14px oklch(0 0 0 / .7), inset 0 0 12px oklch(0 0 0 / .35);
 }
 .wood-sign-sm { font-size: 4.5cqh; padding: 1.5cqh 4cqh; }
+
+/* ===== Sala de espera ===== */
+.lobby { font-family: var(--font-game); color: var(--game-parchment); }
+.wood-plank {
+  position: absolute; display: flex; align-items: center; justify-content: center; margin: 0;
+  background: linear-gradient(180deg, oklch(0.42 0.035 60), oklch(0.3 0.03 55));
+  border: 2px solid var(--wood-edge); border-radius: 4px; color: var(--game-parchment);
+  box-shadow: 0 0.8cqh 1.6cqh oklch(0 0 0 / .7), inset 0 0 1.5cqh oklch(0 0 0 / .45), inset 0 1px 0 oklch(1 0 0 / .12);
+  text-shadow: 0 2px 3px oklch(0 0 0 / .8); font-family: var(--font-game);
+}
+.lobby-title { left: 34.8%; top: 4.5%; width: 30.5%; height: 10.5%; font-size: 6.2cqh; font-weight: 700; letter-spacing: .03em; }
+.lobby-code-row { position: absolute; left: 39.2%; top: 17.5%; height: 7cqh; display: flex; align-items: center; gap: 1.2cqh; }
+.lobby-code { position: relative; height: 100%; padding: 0 2cqh; font-size: 3.4cqh; font-weight: 700; white-space: nowrap; min-width: 30cqh; }
+.lobby-eye {
+  width: 8cqh; height: 8cqh; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+  background: radial-gradient(circle, oklch(0.5 0.02 70), oklch(0.32 0.02 60)); border: 2px solid var(--wood-edge);
+  color: var(--wood-edge); box-shadow: 0 0.6cqh 1.2cqh oklch(0 0 0 / .6);
+}
+.lobby-eye svg { width: 5cqh; height: 5cqh; }
+.lobby-btn { left: 4%; width: 18.5%; height: 9.5%; font-size: 5cqh; font-weight: 700; cursor: pointer; text-decoration: none; }
+.lobby-btn:active, .lobby-eye:active { transform: scale(.97); }
+.lobby-btn:hover, .lobby-btn:focus-visible, .lobby-eye:focus-visible { outline: none; box-shadow: 0 0 3cqh color-mix(in oklab, var(--game-ember) 45%, transparent); }
+.lobby-panel { left: 75.8%; top: 17%; width: 21.4%; height: 52%; flex-direction: column; justify-content: flex-start; padding: 1.5cqh 1.2cqh; }
+.lobby-panel h2 { margin: 0; font-size: 4.2cqh; font-weight: 700; padding-bottom: .8cqh; width: 75%; text-align: center; border-bottom: 2px solid var(--game-parchment); }
+.lobby-panel ul { list-style: none; margin: 1.5cqh 0 0; padding: 0; width: 100%; display: flex; flex-direction: column; justify-content: space-around; flex: 1; }
+.lobby-panel li { display: flex; align-items: center; font-size: 3.1cqh; white-space: nowrap; overflow: hidden; }
+.lobby-avatar { flex-shrink: 0; width: 5.5cqh; height: 5.5cqh; margin-right: 1cqh; border-radius: 50%; display: grid; place-items: center;
+  background: oklch(0.85 0.01 80); color: oklch(0.55 0.01 80); border: 2px solid var(--wood-edge); overflow: hidden; }
+.lobby-avatar svg { width: 4.5cqh; height: 4.5cqh; fill: currentColor; stroke: none; }
+.lobby-wait { color: oklch(0.65 0.04 150); overflow: hidden; text-overflow: ellipsis; }
+.game-root { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); box-sizing: border-box; }
+.game-stage { max-width: 100%; max-height: 100%; }
+.game-stage { width: min(calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right)), calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 1376 / 768)); }
