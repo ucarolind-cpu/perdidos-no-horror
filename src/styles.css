@@ -306,3 +306,22 @@ input.wood-field { width: 100%; text-align: center; outline: none; border-color:
 .game-root { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); box-sizing: border-box; }
 .game-stage { max-width: 100%; max-height: 100%; }
 .game-stage { width: min(calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right)), calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 1376 / 768)); }
+
+/* Sala de espera — skins de madeira da referência */
+.lobby-skin {
+  background-color: transparent; background-repeat: no-repeat; background-size: 100% 100%;
+  border: 0; border-radius: 0; box-shadow: none; filter: drop-shadow(0 0.6cqh 1cqh oklch(0 0 0 / .6));
+  color: oklch(0.82 0.04 75); white-space: nowrap; overflow: hidden;
+}
+.lobby-title.lobby-skin { font-size: 5.6cqh; }
+.lobby-code.lobby-skin { font-size: 3cqh; }
+.lobby-eye.lobby-skin { color: oklch(0.82 0.04 75); }
+.lobby-btn.lobby-skin { font-size: 4.6cqh; }
+.lobby-btn.lobby-skin:hover, .lobby-btn.lobby-skin:focus-visible, .lobby-eye.lobby-skin:focus-visible {
+  box-shadow: none; filter: drop-shadow(0 0 2cqh color-mix(in oklab, var(--game-ember) 70%, transparent));
+}
+.lobby-panel.lobby-skin { padding: 1.8cqh 1cqh; }
+.lobby-panel.lobby-skin li { font-size: 2.5cqh; overflow: visible; }
+.lobby-panel.lobby-skin .lobby-avatar { width: 4.8cqh; height: 4.8cqh; }
+.lobby-panel.lobby-skin .lobby-avatar svg { width: 3.9cqh; height: 3.9cqh; }
+.lobby-panel.lobby-skin .lobby-wait { overflow: visible; text-overflow: clip; }
