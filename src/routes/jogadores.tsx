@@ -3,6 +3,7 @@ import bg from "@/assets/jogadores-bg.jpg.asset.json";
 import { GameShell } from "@/game/GameShell";
 import { playClick } from "@/game/audio";
 import { vibrate } from "@/game/settings";
+import { setPlayerCount } from "@/game/session";
 
 export const Route = createFileRoute("/jogadores")({
   head: () => ({
@@ -42,7 +43,7 @@ function PlayerCount() {
               className="menu-hotspot" style={pos(36.9, o.top, 26.3, 11.2)} onClick={tap} />
           ) : (
             <Link to="/multijogador" key={o.n} aria-label={o.label}
-              className="menu-hotspot" style={pos(36.9, o.top, 26.3, 11.2)} onClick={tap} />
+              className="menu-hotspot" style={pos(36.9, o.top, 26.3, 11.2)} onClick={() => { tap(); setPlayerCount(o.n); }} />
           ),
         )}
         <Link to="/" aria-label="VOLTAR" className="menu-hotspot" style={pos(3.3, 87, 15.8, 9.1)} onClick={tap} />
