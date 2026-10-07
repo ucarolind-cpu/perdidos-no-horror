@@ -82,7 +82,7 @@ function EntrarCodigo() {
             autoCorrect="off" spellCheck={false} enterKeyHint="go"
             aria-label={`Caractere ${i + 1} do código da sala`}
             onFocus={(e) => e.currentTarget.select()}
-            onChange={(e) => onInput(i, e.target.value.replace(chars[i], "") || e.target.value)}
+            onChange={(e) => { if (chars[i] && e.target.value.length > 1 && chars.every(Boolean)) return; onInput(i, e.target.value.replace(chars[i], "") || e.target.value); }}
             onKeyDown={(e) => onKey(i, e)} />
         ))}
         <button ref={btnRef} type="button" aria-label="ENTRAR NA SALA" className="menu-hotspot"
