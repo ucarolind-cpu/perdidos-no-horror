@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
+import { Route as EntrarCodigoRouteImport } from './routes/entrar-codigo'
 import { Route as JogadoresRouteImport } from './routes/jogadores'
 import { Route as MultijogadorRouteImport } from './routes/multijogador'
 import { Route as SalaEsperaRouteImport } from './routes/sala-espera'
@@ -23,6 +24,11 @@ const IndexRoute = IndexRouteImport.update({
 const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
   id: '/configuracoes',
   path: '/configuracoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntrarCodigoRoute = EntrarCodigoRouteImport.update({
+  id: '/entrar-codigo',
+  path: '/entrar-codigo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JogadoresRoute = JogadoresRouteImport.update({
@@ -44,6 +50,7 @@ const SalaEsperaRoute = SalaEsperaRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
+  '/entrar-codigo': typeof EntrarCodigoRoute
   '/jogadores': typeof JogadoresRoute
   '/multijogador': typeof MultijogadorRoute
   '/sala-espera': typeof SalaEsperaRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
+  '/entrar-codigo': typeof EntrarCodigoRoute
   '/jogadores': typeof JogadoresRoute
   '/multijogador': typeof MultijogadorRoute
   '/sala-espera': typeof SalaEsperaRoute
@@ -59,6 +67,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
+  '/entrar-codigo': typeof EntrarCodigoRoute
   '/jogadores': typeof JogadoresRoute
   '/multijogador': typeof MultijogadorRoute
   '/sala-espera': typeof SalaEsperaRoute
@@ -66,13 +75,25 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/configuracoes' | '/jogadores' | '/multijogador' | '/sala-espera'
+    | '/'
+    | '/configuracoes'
+    | '/entrar-codigo'
+    | '/jogadores'
+    | '/multijogador'
+    | '/sala-espera'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/configuracoes' | '/jogadores' | '/multijogador' | '/sala-espera'
+  to:
+    | '/'
+    | '/configuracoes'
+    | '/entrar-codigo'
+    | '/jogadores'
+    | '/multijogador'
+    | '/sala-espera'
   id:
     | '__root__'
     | '/'
     | '/configuracoes'
+    | '/entrar-codigo'
     | '/jogadores'
     | '/multijogador'
     | '/sala-espera'
@@ -81,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConfiguracoesRoute: typeof ConfiguracoesRoute
+  EntrarCodigoRoute: typeof EntrarCodigoRoute
   JogadoresRoute: typeof JogadoresRoute
   MultijogadorRoute: typeof MultijogadorRoute
   SalaEsperaRoute: typeof SalaEsperaRoute
@@ -100,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/configuracoes'
       fullPath: '/configuracoes'
       preLoaderRoute: typeof ConfiguracoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entrar-codigo': {
+      id: '/entrar-codigo'
+      path: '/entrar-codigo'
+      fullPath: '/entrar-codigo'
+      preLoaderRoute: typeof EntrarCodigoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/jogadores': {
@@ -129,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConfiguracoesRoute: ConfiguracoesRoute,
+  EntrarCodigoRoute: EntrarCodigoRoute,
   JogadoresRoute: JogadoresRoute,
   MultijogadorRoute: MultijogadorRoute,
   SalaEsperaRoute: SalaEsperaRoute,

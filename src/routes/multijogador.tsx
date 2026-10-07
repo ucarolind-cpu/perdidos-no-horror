@@ -30,7 +30,7 @@ function Multijogador() {
         <img src={bg.url} alt="" className="game-bg" draggable={false} />
         <h1 className="sr-only">SALA MULTIJOGADOR</h1>
         <Link to="/sala-espera" aria-label="CRIAR SALA" className="menu-hotspot" style={pos(33.2, 28.3, 33.8, 14.5)} onClick={tap} />
-        <button type="button" aria-label="ENTRAR COM CÓDIGO" className="menu-hotspot" style={pos(33.2, 47.5, 33.8, 14.5)} onClick={tap} />
+        <Link to="/entrar-codigo" aria-label="ENTRAR COM CÓDIGO" className="menu-hotspot" style={pos(33.2, 47.5, 33.8, 14.5)} onClick={tap} />
         <button type="button" aria-label="VOLTAR" className="menu-hotspot" style={pos(3.2, 87, 15.9, 9.3)} onClick={tap} />
       </div>
     </GameShell>
