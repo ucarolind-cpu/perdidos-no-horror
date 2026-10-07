@@ -1,10 +1,18 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { initAudio } from "./audio";
 import { useSettings } from "./settings";
 
 /** Envolve todas as telas: áudio, brilho e aviso de orientação. */
 export function GameShell({ children }: { children: ReactNode }) {
   const { brightness } = useSettings();
+  const rootRef = useRef<HTMLElement>(null);
+
+  // Preenche as laterais com o próprio cenário (ampliado e cortado), sem faixas pretas.
+  useEffect(() => {
+    const root = rootRef.current;
+    const img = root?.querySelector<HTMLImageElement>(".game-bg");
+    if (root && img) root.style.setProperty("--fill-bg", `url("${img.src}")`);
+  });
 
   useEffect(() => {
     const start = async () => {
@@ -24,7 +32,7 @@ export function GameShell({ children }: { children: ReactNode }) {
   const light = brightness > 50 ? ((brightness - 50) / 50) * 0.35 : 0;
 
   return (
-    <main className="game-root" lang="pt-BR">
+    <main ref={rootRef} className="game-root" lang="pt-BR">
       {children}
       <div className="brightness-dark" style={{ opacity: dark }} aria-hidden="true" />
       <div className="brightness-light" style={{ opacity: light }} aria-hidden="true" />

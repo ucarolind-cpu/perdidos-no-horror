@@ -335,3 +335,12 @@ input.wood-field { width: 100%; text-align: center; outline: none; border-color:
   text-shadow: 0 1px 0 oklch(1 0 0 / .25); border-radius: 4px;
 }
 .code-box:focus { box-shadow: 0 0 2.5cqh color-mix(in oklab, var(--game-ember) 55%, transparent) inset; }
+
+/* Preenchimento lateral: cenário em modo "cover" atrás do palco */
+.game-root::before {
+  content: ""; position: absolute; inset: -4%; z-index: 0; pointer-events: none;
+  background: var(--fill-bg, none) center / cover no-repeat;
+  filter: blur(10px) brightness(.9);
+}
+.game-stage { z-index: 1; }
+.game-root { overflow: hidden; }
