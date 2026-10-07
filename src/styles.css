@@ -325,3 +325,13 @@ input.wood-field { width: 100%; text-align: center; outline: none; border-color:
 .lobby-panel.lobby-skin .lobby-avatar { width: 4.8cqh; height: 4.8cqh; }
 .lobby-panel.lobby-skin .lobby-avatar svg { width: 3.9cqh; height: 3.9cqh; }
 .lobby-panel.lobby-skin .lobby-wait { overflow: visible; text-overflow: clip; }
+
+/* ===== Entrar com código ===== */
+.code-stage { transition: transform .2s ease-out; }
+.code-box {
+  position: absolute; top: 43.4%; width: 7.6%; height: 13.7%; padding: 0; margin: 0;
+  background: transparent; border: 0; outline: none; text-align: center; caret-color: var(--game-ember);
+  font: 700 9cqh var(--font-game); color: oklch(0.25 0.03 50); text-transform: uppercase;
+  text-shadow: 0 1px 0 oklch(1 0 0 / .25); border-radius: 4px;
+}
+.code-box:focus { box-shadow: 0 0 2.5cqh color-mix(in oklab, var(--game-ember) 55%, transparent) inset; }
