@@ -340,7 +340,7 @@ input.wood-field { width: 100%; text-align: center; outline: none; border-color:
 .game-root::before {
   content: ""; position: absolute; inset: -4%; z-index: 0; pointer-events: none;
   background: var(--fill-bg, none) center / cover no-repeat;
-  filter: blur(14px) brightness(.75);
+  filter: blur(10px) brightness(.9);
 }
-.game-stage { z-index: 1; box-shadow: 0 0 6vh 3vh color-mix(in oklab, var(--game-void) 35%, transparent); }
+.game-stage { z-index: 1; }
 .game-root { overflow: hidden; }
