@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { initAudio } from "./audio";
 import { useSettings } from "./settings";
+import { FadeOverlay } from "./transition";
 
 /** Envolve todas as telas: áudio, brilho e aviso de orientação. */
 export function GameShell({ children }: { children: ReactNode }) {
@@ -36,6 +37,7 @@ export function GameShell({ children }: { children: ReactNode }) {
       {children}
       <div className="brightness-dark" style={{ opacity: dark }} aria-hidden="true" />
       <div className="brightness-light" style={{ opacity: light }} aria-hidden="true" />
+      <FadeOverlay />
       <div className="rotate-overlay" role="alert">
         <div className="rotate-phone" aria-hidden="true" />
         <p>Vire o celular para jogar.</p>
