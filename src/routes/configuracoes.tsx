@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type CSSProperties } from "react";
 import bg from "@/assets/settings-bg.jpg.asset.json";
 import { GameShell } from "@/game/GameShell";
+import { FadeInFromBlack } from "@/game/DoorTransition";
 import { playClick } from "@/game/audio";
 import { PLAYER_NAME_MAX, updateSettings, useSettings, vibrate, type GameSettings } from "@/game/settings";
 
@@ -131,6 +132,7 @@ function SettingsScreen() {
           <Toggle k="gore" label="Sangue/Gore" />
         </div>
         <div className="settings-more" aria-hidden="true">▼</div>
+        <FadeInFromBlack />
       </div>
     </GameShell>
   );
