@@ -4,6 +4,8 @@ import { GameShell } from "@/game/GameShell";
 import { playClick } from "@/game/audio";
 import { vibrate } from "@/game/settings";
 import { setPlayerCount } from "@/game/session";
+import { useCallback, useState } from "react";
+import { DoorTransition } from "@/game/DoorTransition";
 
 export const Route = createFileRoute("/jogadores")({
   head: () => ({
@@ -32,6 +34,8 @@ const options = [
 ];
 
 function PlayerCount() {
+  const [busy, setBusy] = useState(false);
+  const end = useCallback(() => setBusy(false), []);
   return (
     <GameShell>
       <div className="game-stage">
@@ -42,11 +46,13 @@ function PlayerCount() {
             <button type="button" key={o.n} aria-label={o.label}
               className="menu-hotspot" style={pos(36.9, o.top, 26.3, 11.2)} onClick={tap} />
           ) : (
-            <Link to="/multijogador" key={o.n} aria-label={o.label}
-              className="menu-hotspot" style={pos(36.9, o.top, 26.3, 11.2)} onClick={() => { tap(); setPlayerCount(o.n); }} />
+            <button type="button" key={o.n} aria-label={o.label} disabled={busy}
+              className="menu-hotspot" style={pos(36.9, o.top, 26.3, 11.2)}
+              onClick={() => { if (busy) return; tap(); setPlayerCount(o.n); setBusy(true); }} />
           ),
         )}
         <Link to="/" aria-label="VOLTAR" className="menu-hotspot" style={pos(3.3, 87, 15.8, 9.1)} onClick={tap} />
+        {busy && <DoorTransition onDone={end} />}
       </div>
     </GameShell>
   );
