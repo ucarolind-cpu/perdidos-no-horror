@@ -5,7 +5,7 @@ import { playClick } from "@/game/audio";
 import { vibrate } from "@/game/settings";
 import { setPlayerCount } from "@/game/session";
 import { useCallback, useState } from "react";
-import { DoorTransition } from "@/game/DoorTransition";
+import { DoorTransition, FadeInFromBlack } from "@/game/DoorTransition";
 
 export const Route = createFileRoute("/jogadores")({
   head: () => ({
@@ -53,6 +53,7 @@ function PlayerCount() {
         )}
         <Link to="/" aria-label="VOLTAR" className="menu-hotspot" style={pos(3.3, 87, 15.8, 9.1)} onClick={tap} />
         {busy && <DoorTransition onDone={end} />}
+        <FadeInFromBlack />
       </div>
     </GameShell>
   );

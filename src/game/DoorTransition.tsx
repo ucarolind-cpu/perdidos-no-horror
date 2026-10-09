@@ -63,6 +63,11 @@ export function FadeInFromBlack() {
     transition.fadeInNext = false;
     return v;
   });
+  const [ms] = useState(() => {
+    const m = transition.fadeInMs;
+    transition.fadeInMs = 500;
+    return m;
+  });
   const [visible, setVisible] = useState(active);
   useEffect(() => {
     if (!active) return;
@@ -73,7 +78,7 @@ export function FadeInFromBlack() {
   return (
     <div aria-hidden style={{
       ...full, background: "#000", pointerEvents: "none",
-      opacity: visible ? 1 : 0, transition: "opacity 0.5s linear",
+      opacity: visible ? 1 : 0, transition: `opacity ${ms / 1000}s linear`,
     }} />
   );
 }

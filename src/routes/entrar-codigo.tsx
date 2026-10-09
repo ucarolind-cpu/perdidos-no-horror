@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import bg from "@/assets/codigo-bg.jpg.asset.json";
 import { GameShell } from "@/game/GameShell";
 import { playClick } from "@/game/audio";
+import { FadeInFromBlack } from "@/game/DoorTransition";
 import { vibrate } from "@/game/settings";
 
 export const Route = createFileRoute("/entrar-codigo")({
@@ -89,6 +90,7 @@ function EntrarCodigo() {
           style={pos(34.7, 69, 30.9, 13.5)} onClick={tap} />
         <Link to="/multijogador" aria-label="VOLTAR" className="menu-hotspot"
           style={pos(3.3, 87, 15.8, 9.4)} onClick={tap} />
+        <FadeInFromBlack />
       </div>
     </GameShell>
   );
