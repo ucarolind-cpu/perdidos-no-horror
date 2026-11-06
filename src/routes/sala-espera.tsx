@@ -9,7 +9,8 @@ import skinBtn1 from "@/assets/lobby-btn1.png.asset.json";
 import skinBtn2 from "@/assets/lobby-btn2.png.asset.json";
 import skinPanel from "@/assets/lobby-panel.png.asset.json";
 import { GameShell } from "@/game/GameShell";
-import { playClick } from "@/game/audio";
+import { playClick, playScreenMusic } from "@/game/audio";
+import lobbyMusic from "@/assets/sala-espera-musica.mp3.asset.json";
 import { vibrate } from "@/game/settings";
 import { randomRoomCode } from "@/game/session";
 import { FadeInFromBlack } from "@/game/DoorTransition";
@@ -35,6 +36,7 @@ function SalaEspera() {
   const [code, setCode] = useState("");
   const [show, setShow] = useState(false);
   useEffect(() => setCode(randomRoomCode()), []);
+  useEffect(() => playScreenMusic(lobbyMusic.url), []);
 
   return (
     <GameShell>
