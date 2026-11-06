@@ -9,7 +9,8 @@ import { getSettings, subscribeSettings } from "./settings";
 export const MUSIC_URL: string | null = null;
 
 let ctx: AudioContext | null = null;
-let master: GainNode, music: GainNode, sfx: GainNode;
+let master: GainNode, music: GainNode, sfx: GainNode, drone: GainNode;
+let screenTracks = 0;
 
 function applyVolumes() {
   if (!ctx) return;
@@ -26,7 +27,7 @@ function startProceduralMusic() {
   const filter = c.createBiquadFilter();
   filter.type = "lowpass";
   filter.frequency.value = 420;
-  filter.connect(music);
+  filter.connect(drone);
   // Drone grave levemente desafinado
   [55, 55.6, 82.4].forEach((f) => {
     const o = c.createOscillator();
@@ -55,7 +56,7 @@ function startProceduralMusic() {
     g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime(0.08, t + 1.5);
     g.gain.exponentialRampToValueAtTime(0.0001, t + 6);
-    o.connect(g).connect(music);
+    o.connect(g).connect(drone);
     o.start(t);
     o.stop(t + 6.2);
     setTimeout(pluck, 5000 + Math.random() * 6000);
@@ -74,6 +75,8 @@ export function initAudio() {
   sfx = ctx.createGain();
   music.connect(master);
   sfx.connect(master);
+  drone = ctx.createGain();
+  drone.connect(music);
   master.connect(ctx.destination);
   applyVolumes();
   subscribeSettings(applyVolumes);
@@ -111,4 +114,48 @@ export function playClick() {
 /** Saída de efeitos para sistemas futuros de jogabilidade. */
 export function getSfxBus() {
   return ctx ? { ctx, bus: sfx } : null;
+}
+
+/**
+ * Toca uma música em loop exclusiva de uma tela (canal de música),
+ * silenciando a ambientação padrão. Retorna a função que para a música.
+ */
+export function playScreenMusic(url: string): () => void {
+  if (typeof window === "undefined") return () => {};
+  const el = new Audio(url);
+  el.loop = true;
+  el.preload = "auto";
+  let node: MediaElementAudioSourceNode | null = null;
+  let stopped = false;
+  let ducked = false;
+  const start = () => {
+    if (stopped) return;
+    initAudio();
+    if (!ctx) return;
+    if (!node) {
+      node = ctx.createMediaElementSource(el);
+      node.connect(music);
+      screenTracks++;
+      ducked = true;
+      drone.gain.setTargetAtTime(0, ctx.currentTime, 0.2);
+    }
+    void ctx.resume();
+    void el.play().catch(() => {});
+  };
+  start();
+  // Se o navegador bloquear, começa no próximo toque.
+  const retry = () => { if (el.paused) start(); };
+  document.addEventListener("pointerdown", retry);
+  return () => {
+    stopped = true;
+    document.removeEventListener("pointerdown", retry);
+    el.pause();
+    el.removeAttribute("src");
+    el.load();
+    node?.disconnect();
+    if (ducked && ctx) {
+      screenTracks--;
+      if (screenTracks <= 0) drone.gain.setTargetAtTime(1, ctx.currentTime, 0.4);
+    }
+  };
 }
