@@ -12,6 +12,7 @@ import { GameShell } from "@/game/GameShell";
 import { playClick } from "@/game/audio";
 import { vibrate } from "@/game/settings";
 import { randomRoomCode } from "@/game/session";
+import { FadeInFromBlack } from "@/game/DoorTransition";
 
 export const Route = createFileRoute("/sala-espera")({
   head: () => ({
@@ -60,6 +61,7 @@ function SalaEspera() {
             ))}
           </ul>
         </section>
+        <FadeInFromBlack />
       </div>
     </GameShell>
   );
