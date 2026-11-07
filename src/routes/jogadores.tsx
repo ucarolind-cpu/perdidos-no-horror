@@ -4,7 +4,8 @@ import { GameShell } from "@/game/GameShell";
 import { playClick } from "@/game/audio";
 import { vibrate } from "@/game/settings";
 import { setPlayerCount } from "@/game/session";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { preloadPlayerMenuAssets } from "@/game/preload";
 import { DoorTransition, FadeInFromBlack } from "@/game/DoorTransition";
 
 export const Route = createFileRoute("/jogadores")({
@@ -34,6 +35,7 @@ const options = [
 ];
 
 function PlayerCount() {
+  useEffect(() => { preloadPlayerMenuAssets(); }, []);
   const [busy, setBusy] = useState(false);
   const end = useCallback(() => setBusy(false), []);
   return (

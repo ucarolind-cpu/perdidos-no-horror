@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Route transition sounds use an optional FadeToBlack sound and the shared effects bus; music silence is acquired on the create-room click and released on route cleanup, keeping music muted throughout navigation without muting effects or changing volume preferences.
+- Menu media is preloaded only from the owning screen's mount effect through game/preload; reuse warmed audio elements, retain decoded images, and fall back to normal loading on errors to avoid front-loading future screens.

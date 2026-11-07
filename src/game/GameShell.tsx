@@ -15,6 +15,7 @@ export function GameShell({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
+    initAudio();
     const start = async () => {
       initAudio();
       try {

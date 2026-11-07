@@ -1,4 +1,5 @@
 import { getSettings, subscribeSettings } from "./settings";
+import { acquireAudio } from "./preload";
 
 /**
  * Sistema de áudio: master -> (música | efeitos).
@@ -97,6 +98,18 @@ export function initAudio() {
   master.connect(ctx.destination);
   applyVolumes();
   subscribeSettings(applyVolumes);
+  // Prepare on mount, then unlock only on the first real interaction.
+  const unlock = () => {
+    if (!ctx) return;
+    void ctx.resume().then(() => {
+      window.removeEventListener("pointerdown", unlock, true);
+      window.removeEventListener("keydown", unlock, true);
+      window.removeEventListener("touchend", unlock, true);
+    }).catch(() => {});
+  };
+  window.addEventListener("pointerdown", unlock, true);
+  window.addEventListener("keydown", unlock, true);
+  window.addEventListener("touchend", unlock, true);
   if (MUSIC_URL) {
     const el = new Audio(MUSIC_URL);
     el.loop = true;
@@ -135,7 +148,7 @@ export function getSfxBus() {
 
 /** Efeito de arquivo, sem repetição, no canal de efeitos existente. */
 export function createOneShotSound(url: string) {
-  const el = new Audio(url);
+  const el = acquireAudio(url);
   el.loop = false;
   el.preload = "auto";
   const output = getSfxBus();
@@ -166,7 +179,7 @@ export function createOneShotSound(url: string) {
  */
 export function playScreenMusic(url: string): () => void {
   if (typeof window === "undefined") return () => {};
-  const el = new Audio(url);
+  const el = acquireAudio(url);
   el.loop = true;
   el.preload = "auto";
   let node: MediaElementAudioSourceNode | null = null;
