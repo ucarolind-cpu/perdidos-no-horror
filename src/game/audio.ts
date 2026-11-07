@@ -11,14 +11,31 @@ export const MUSIC_URL: string | null = null;
 let ctx: AudioContext | null = null;
 let master: GainNode, music: GainNode, sfx: GainNode, drone: GainNode;
 let screenTracks = 0;
+let musicSilencers = 0;
 
 function applyVolumes() {
   if (!ctx) return;
   const s = getSettings();
   const t = ctx.currentTime;
   master.gain.setTargetAtTime(s.masterVolume / 100, t, 0.05);
-  music.gain.setTargetAtTime((s.musicVolume / 100) * 0.35, t, 0.05);
+  music.gain.setTargetAtTime(musicSilencers > 0 ? 0 : (s.musicVolume / 100) * 0.35, t, 0.05);
   sfx.gain.setTargetAtTime(s.sfxVolume / 100, t, 0.05);
+}
+
+/** Silencia somente a música imediatamente, preservando o canal de efeitos. */
+export function muteBackgroundMusic(): () => void {
+  musicSilencers++;
+  if (ctx) {
+    music.gain.cancelScheduledValues(ctx.currentTime);
+    music.gain.setValueAtTime(0, ctx.currentTime);
+  }
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    musicSilencers--;
+    if (musicSilencers === 0) applyVolumes();
+  };
 }
 
 function startProceduralMusic() {
