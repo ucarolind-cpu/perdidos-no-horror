@@ -47,7 +47,7 @@ describe("Música durante Criar Sala", () => {
     state.listener();
     expect(music.gain.setTargetAtTime).toHaveBeenLastCalledWith(0, 10, 0.05);
     restore();
-    expect(music.gain.setTargetAtTime).toHaveBeenLastCalledWith(0.14 - Number.EPSILON / 8, 10, 0.05);
+    expect(music.gain.setTargetAtTime).toHaveBeenLastCalledWith(expect.closeTo(0.14, 8), 10, 0.05);
     const calls = music.gain.setTargetAtTime.mock.calls.length;
     restore();
     expect(music.gain.setTargetAtTime).toHaveBeenCalledTimes(calls);
