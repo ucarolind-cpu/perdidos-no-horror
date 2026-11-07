@@ -116,6 +116,33 @@ export function getSfxBus() {
   return ctx ? { ctx, bus: sfx } : null;
 }
 
+/** Efeito de arquivo, sem repetição, no canal de efeitos existente. */
+export function createOneShotSound(url: string) {
+  const el = new Audio(url);
+  el.loop = false;
+  el.preload = "auto";
+  const output = getSfxBus();
+  const node = output?.ctx.createMediaElementSource(el);
+  if (node && output) node.connect(output.bus);
+  let stopped = false;
+  let played = false;
+  return {
+    play: () => {
+      if (stopped || played || !output) return;
+      played = true;
+      void output.ctx.resume();
+      void el.play().catch(() => {});
+    },
+    stop: () => {
+      stopped = true;
+      el.pause();
+      el.removeAttribute("src");
+      el.load();
+      node?.disconnect();
+    },
+  };
+}
+
 /**
  * Toca uma música em loop exclusiva de uma tela (canal de música),
  * silenciando a ambientação padrão. Retorna a função que para a música.

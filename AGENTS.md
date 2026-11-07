@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Route transition sounds use an optional FadeToBlack sound and the shared audio effects bus; this keeps unrelated transitions silent and honors existing volume settings.
