@@ -7,6 +7,7 @@ import { FadeInFromBlack } from "@/game/DoorTransition";
 import { FadeToBlack } from "@/game/FadeTransition";
 import { useCallback, useEffect, useRef, useState } from "react";
 import matchstickSound from "@/assets/matchstick_strike.mp3.asset.json";
+import { preloadCreateRoomAssets } from "@/game/preload";
 
 export const Route = createFileRoute("/multijogador")({
   head: () => ({
@@ -28,6 +29,7 @@ const pos = (left: number, top: number, width: number, height: number) => ({
 const tap = () => { playClick(); vibrate(20); };
 
 function Multijogador() {
+  useEffect(() => { preloadCreateRoomAssets(); }, []);
   const restoreMusic = useRef<(() => void) | null>(null);
   useEffect(() => () => {
     restoreMusic.current?.();
