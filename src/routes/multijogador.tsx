@@ -6,6 +6,7 @@ import { vibrate } from "@/game/settings";
 import { FadeInFromBlack } from "@/game/DoorTransition";
 import { FadeToBlack } from "@/game/FadeTransition";
 import { useCallback, useState } from "react";
+import matchstickSound from "@/assets/matchstick_strike.mp3.asset.json";
 
 export const Route = createFileRoute("/multijogador")({
   head: () => ({
@@ -43,7 +44,7 @@ function Multijogador() {
         <Link to="/jogadores" aria-label="VOLTAR" className="menu-hotspot" style={pos(3.2, 87, 15.9, 9.3)} onClick={tap} />
         <FadeInFromBlack />
         {busy && <FadeToBlack to="/entrar-codigo" onDone={end} />}
-        {creating && <FadeToBlack to="/sala-espera" onDone={endCreate} holdMs={3000} safetyMs={5000} />}
+        {creating && <FadeToBlack to="/sala-espera" onDone={endCreate} holdMs={3000} safetyMs={5000} blackSoundUrl={matchstickSound.url} />}
       </div>
     </GameShell>
   );
