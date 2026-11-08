@@ -2,6 +2,7 @@ import door from "@/assets/door-scene.jpg.asset.json";
 import matchstick from "@/assets/matchstick_strike.mp3.asset.json";
 import lobbyBackground from "@/assets/espera-bg.jpg.asset.json";
 import lobbyMusic from "@/assets/sala-espera-musica.mp3.asset.json";
+import { prepareOwnerSprite } from "./ownerSprite";
 
 const images = new Map<string, HTMLImageElement>();
 const audio = new Map<string, HTMLAudioElement>();
@@ -47,4 +48,5 @@ export function preloadPlayerMenuAssets() {
 
 export function preloadCreateRoomAssets() {
   preloadAudio(lobbyMusic.url);
+  void prepareOwnerSprite();
 }
