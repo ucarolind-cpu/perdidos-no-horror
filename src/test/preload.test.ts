@@ -3,7 +3,6 @@ import door from "@/assets/door-scene.jpg.asset.json";
 import matchstick from "@/assets/matchstick_strike.mp3.asset.json";
 import background from "@/assets/espera-bg.jpg.asset.json";
 import music from "@/assets/sala-espera-musica.mp3.asset.json";
-import owner from "@/assets/dono-sala.webp.asset.json";
 
 describe("Carregamento gradual dos menus", () => {
   const images: Array<{ src: string; onerror?: () => void }> = [];
@@ -32,10 +31,10 @@ describe("Carregamento gradual dos menus", () => {
     expect(sounds[0]?.load).toHaveBeenCalledTimes(1);
     expect(sounds[0]?.play).not.toHaveBeenCalled();
   });
-  it("ao entrar no menu criar sala prepara personagem e música sem reproduzir áudio", async () => {
+  it("ao entrar no menu criar sala carrega apenas a música da sala e reutiliza o áudio", async () => {
     const preload = await import("@/game/preload");
     preload.preloadCreateRoomAssets();
-    expect(images.map(x => x.src)).toEqual([owner.url]);
+    expect(images).toHaveLength(0);
     expect(sounds.map(x => x.src)).toEqual([music.url]);
     expect(preload.acquireAudio(music.url)).toBe(sounds[0]);
     expect(sounds[0]?.play).not.toHaveBeenCalled();

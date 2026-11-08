@@ -11,9 +11,8 @@ import skinPanel from "@/assets/lobby-panel.png.asset.json";
 import { GameShell } from "@/game/GameShell";
 import { playClick, playScreenMusic } from "@/game/audio";
 import lobbyMusic from "@/assets/sala-espera-musica.mp3.asset.json";
-import { useSettings, vibrate } from "@/game/settings";
-import { randomRoomCode, session } from "@/game/session";
-import { OwnerCharacter } from "@/game/OwnerCharacter";
+import { vibrate } from "@/game/settings";
+import { randomRoomCode } from "@/game/session";
 import { FadeInFromBlack } from "@/game/DoorTransition";
 
 export const Route = createFileRoute("/sala-espera")({
@@ -34,8 +33,6 @@ const skin = (u: string) => ({ backgroundImage: `url(${u})` });
 const tap = () => { playClick(); vibrate(20); };
 
 function SalaEspera() {
-  const { playerName } = useSettings();
-  const ownerName = session.roomOwner?.playerName ?? playerName;
   const [code, setCode] = useState("");
   const [show, setShow] = useState(false);
   useEffect(() => setCode(randomRoomCode()), []);
@@ -45,7 +42,6 @@ function SalaEspera() {
     <GameShell>
       <div className="game-stage lobby">
         <img src={bg.url} alt="" className="game-bg" draggable={false} />
-        <OwnerCharacter />
         <h1 className="wood-plank lobby-skin lobby-title" style={skin(skinTitle.url)}>SALA DE ESPERA</h1>
         <div className="lobby-code-row">
           <div className="wood-plank lobby-skin lobby-code" style={skin(skinCode.url)}>CÓDIGO DA SALA: {show ? code : "••••"}</div>
@@ -62,8 +58,7 @@ function SalaEspera() {
             {[0, 1, 2, 3, 4].map((i) => (
               <li key={i}>
                 <span className="lobby-avatar"><User /></span>
-                <span className={i === 0 ? "lobby-owner-name" : undefined}>{i === 0 ? ownerName : "[player]"}</span>
-                {i !== 0 && <span className="lobby-wait">&nbsp;- Aguardando...</span>}
+                <span>[player]</span><span className="lobby-wait">&nbsp;- Aguardando...</span>
               </li>
             ))}
           </ul>
