@@ -1,5 +1,12 @@
 /** Dados temporários da sessão (memória). Uso futuro. */
-export const session = { playerCount: 2 };
+export const session: { playerCount: number; roomOwner: { playerName: string } | null } = {
+  playerCount: 2,
+  roomOwner: null,
+};
+
+export function setRoomOwner(playerName: string) {
+  session.roomOwner = { playerName };
+}
 
 export function setPlayerCount(n: number) {
   session.playerCount = n;

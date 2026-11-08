@@ -276,6 +276,12 @@ input.wood-field { width: 100%; text-align: center; outline: none; border-color:
 
 /* ===== Sala de espera ===== */
 .lobby { font-family: var(--font-game); color: var(--game-parchment); }
+.lobby-owner-character {
+  position: absolute; left: 50%; bottom: 19.53%; width: 9.74%;
+  aspect-ratio: 134 / 310; transform: translateX(-50%); pointer-events: none;
+}
+.lobby-owner-character img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.lobby-owner-name { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
 .wood-plank {
   position: absolute; display: flex; align-items: center; justify-content: center; margin: 0;
   background: linear-gradient(180deg, oklch(0.42 0.035 60), oklch(0.3 0.03 55));
