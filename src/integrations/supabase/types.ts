@@ -14,13 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      player_devices: {
+        Row: {
+          created_at: string
+          id: string
+          secret_hash: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          secret_hash: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          secret_hash?: string
+        }
+        Relationships: []
+      }
+      room_players: {
+        Row: {
+          is_host: boolean
+          joined_at: string
+          player_id: string
+          player_name: string
+          room_id: string
+        }
+        Insert: {
+          is_host?: boolean
+          joined_at?: string
+          player_id: string
+          player_name: string
+          room_id: string
+        }
+        Update: {
+          is_host?: boolean
+          joined_at?: string
+          player_id?: string
+          player_name?: string
+          room_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_players_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "room_players_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rooms: {
+        Row: {
+          code: string
+          created_at: string
+          host_name: string
+          host_player_id: string
+          id: string
+          max_players: number
+          status: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          host_name: string
+          host_player_id: string
+          id: string
+          max_players: number
+          status?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          host_name?: string
+          host_player_id?: string
+          id?: string
+          max_players?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rooms_host_player_id_fkey"
+            columns: ["host_player_id"]
+            isOneToOne: true
+            referencedRelation: "player_devices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      device_room_action: {
+        Args: {
+          p_action: string
+          p_device_id: string
+          p_host_name?: string
+          p_max_players?: number
+          p_room_id: string
+          p_secret_hash: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
