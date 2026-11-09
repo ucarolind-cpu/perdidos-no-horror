@@ -62,7 +62,11 @@ function SalaEspera() {
             {[0, 1, 2, 3, 4].map((i) => (
               <li key={i}>
                 <span className="lobby-avatar"><User /></span>
-                <span className={i === 0 ? "lobby-owner-name" : undefined} title={i === 0 ? ownerName : undefined}>{i === 0 ? ownerName : "[player]"}</span><span className="lobby-wait">&nbsp;- Aguardando...</span>
+                {i === 0 ? (
+                  <span className="lobby-owner-identity"><span className="lobby-owner-name">{ownerName}</span><span className="lobby-wait">- Aguardando...</span></span>
+                ) : (
+                  <><span>[player]</span><span className="lobby-wait">&nbsp;- Aguardando...</span></>
+                )}
               </li>
             ))}
           </ul>

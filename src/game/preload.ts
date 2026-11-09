@@ -7,6 +7,7 @@ import ownerSprite from "@/assets/room-owner.webp.asset.json";
 const images = new Map<string, HTMLImageElement>();
 const audio = new Map<string, HTMLAudioElement>();
 const imageLoads = new Map<string, Promise<HTMLImageElement | null>>();
+const readyImages = new Map<string, HTMLImageElement>();
 
 export function preloadImage(url: string) {
   if (typeof window === "undefined") return Promise.resolve(null);
@@ -22,6 +23,7 @@ export function preloadImage(url: string) {
       try { await image.decode?.(); } catch { /* loaded image remains usable */ }
       image.onload = null;
       image.onerror = null;
+      readyImages.set(url, image);
       settle(image);
     };
     image.onerror = () => {
@@ -38,6 +40,10 @@ export function preloadImage(url: string) {
 /** Retains the decoded element across room visits, not only its URL. */
 export function prepareRoomOwnerImage() {
   return preloadImage(ownerSprite.url);
+}
+
+export function getReadyRoomOwnerImage() {
+  return readyImages.get(ownerSprite.url) ?? null;
 }
 
 export function preloadAudio(url: string) {

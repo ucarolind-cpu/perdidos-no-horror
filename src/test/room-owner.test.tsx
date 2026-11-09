@@ -18,6 +18,7 @@ describe("Preparação do dono da sala", () => {
       }
     });
     const { preloadCreateRoomAssets, prepareRoomOwnerImage } = await import("@/game/preload");
+    vi.stubGlobal("Audio", class { load = vi.fn(); });
     preloadCreateRoomAssets();
     const pending = prepareRoomOwnerImage();
     expect(loaded).toHaveLength(1);
