@@ -1,3 +1,3 @@
-- [ ] Preparar e reutilizar a imagem transparente do dono antes da sala abrir.
-- [ ] Posicionar o dono na laje central e mostrar seu nome na lista existente.
-- [ ] Verificar criação, transição, reabertura e apresentação em telas horizontais.
+- [x] Preparar e reutilizar a imagem transparente do dono antes da sala abrir.
+- [x] Posicionar o dono na laje central e mostrar seu nome na lista existente.
+- [x] Verificar criação, transição, reabertura e apresentação em telas horizontais.
