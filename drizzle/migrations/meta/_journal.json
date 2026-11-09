@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1794186084850,
+      "tag": "0000_real_rooms_device_capabilities",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794186118589,
+      "tag": "0001_enable_room_cleanup_scheduler",
+      "breakpoints": true
+    }
+  ]
+}
