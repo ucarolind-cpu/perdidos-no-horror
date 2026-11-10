@@ -36,6 +36,7 @@ export type Database = {
         Row: {
           is_host: boolean
           joined_at: string
+          last_seen_at: string
           player_id: string
           player_name: string
           room_id: string
@@ -43,6 +44,7 @@ export type Database = {
         Insert: {
           is_host?: boolean
           joined_at?: string
+          last_seen_at?: string
           player_id: string
           player_name: string
           room_id: string
@@ -50,6 +52,7 @@ export type Database = {
         Update: {
           is_host?: boolean
           joined_at?: string
+          last_seen_at?: string
           player_id?: string
           player_name?: string
           room_id?: string
@@ -79,6 +82,7 @@ export type Database = {
           host_player_id: string
           id: string
           max_players: number
+          realtime_topic: string
           status: string
         }
         Insert: {
@@ -88,6 +92,7 @@ export type Database = {
           host_player_id: string
           id: string
           max_players: number
+          realtime_topic?: string
           status?: string
         }
         Update: {
@@ -97,6 +102,7 @@ export type Database = {
           host_player_id?: string
           id?: string
           max_players?: number
+          realtime_topic?: string
           status?: string
         }
         Relationships: [
@@ -114,6 +120,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_disconnected_room_players: { Args: never; Returns: undefined }
       device_room_action: {
         Args: {
           p_action: string
@@ -121,6 +128,17 @@ export type Database = {
           p_host_name?: string
           p_max_players?: number
           p_room_id: string
+          p_secret_hash: string
+        }
+        Returns: Json
+      }
+      room_member_action: {
+        Args: {
+          p_action: string
+          p_code?: string
+          p_device_id: string
+          p_name?: string
+          p_room_id?: string
           p_secret_hash: string
         }
         Returns: Json
