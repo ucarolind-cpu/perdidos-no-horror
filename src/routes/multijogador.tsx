@@ -6,9 +6,9 @@ import { vibrate } from "@/game/settings";
 import { FadeInFromBlack } from "@/game/DoorTransition";
 import { FadeToBlack } from "@/game/FadeTransition";
 import { useCallback, useEffect, useRef, useState } from "react";
-import matchstickSound from "@/assets/matchstick_strike.mp3.asset.json";
+import { RoomEntryTransition } from "@/game/RoomEntryTransition";
 import { preloadCreateRoomAssets } from "@/game/preload";
-import { useRoomActions } from "@/game/rooms";
+import { useRoomActions, takeRoomMenuMessage } from "@/game/rooms";
 
 export const Route = createFileRoute("/multijogador")({
   head: () => ({
@@ -31,6 +31,8 @@ const tap = () => { playClick(); vibrate(20); };
 
 function Multijogador() {
   const { create } = useRoomActions();
+  const [message, setMessage] = useState<string | null>(null);
+  useEffect(() => { setMessage(takeRoomMenuMessage()); }, []);
   useEffect(() => { preloadCreateRoomAssets(); }, []);
   const restoreMusic = useRef<(() => void) | null>(null);
   useEffect(() => () => {
@@ -53,7 +55,8 @@ function Multijogador() {
         <Link to="/jogadores" aria-label="VOLTAR" className="menu-hotspot" style={pos(3.2, 87, 15.9, 9.3)} onClick={tap} />
         <FadeInFromBlack />
         {busy && <FadeToBlack to="/entrar-codigo" onDone={end} />}
-        {creating && <FadeToBlack to="/sala-espera" onDone={endCreate} holdMs={3000} safetyMs={5000} blackSoundUrl={matchstickSound.url} />}
+        {message && <div className="room-message" role="status">{message}</div>}
+        {creating && <RoomEntryTransition onDone={endCreate} />}
       </div>
     </GameShell>
   );

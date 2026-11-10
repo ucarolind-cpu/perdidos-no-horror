@@ -1,10 +1,13 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import bg from "@/assets/codigo-bg.jpg.asset.json";
 import { GameShell } from "@/game/GameShell";
 import { playClick } from "@/game/audio";
 import { FadeInFromBlack } from "@/game/DoorTransition";
 import { vibrate } from "@/game/settings";
+import { useRoomActions } from "@/game/rooms";
+import { RoomEntryTransition } from "@/game/RoomEntryTransition";
+import { preloadCreateRoomAssets, preloadPlayerMenuAssets } from "@/game/preload";
 
 export const Route = createFileRoute("/entrar-codigo")({
   head: () => ({
@@ -27,6 +30,12 @@ const tap = () => { playClick(); vibrate(20); };
 const lefts = [33.4, 42.0, 50.5, 58.9];
 
 function EntrarCodigo() {
+  const { join } = useRoomActions();
+  const [message, setMessage] = useState<string | null>(null);
+  const [entering, setEntering] = useState(false);
+  const joining = useRef(false);
+  const endEntry = useCallback(() => setEntering(false), []);
+  useEffect(() => { preloadCreateRoomAssets(); preloadPlayerMenuAssets(); }, []);
   const [chars, setChars] = useState(["", "", "", ""]);
   const refs = useRef<(HTMLInputElement | null)[]>([]);
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -87,10 +96,19 @@ function EntrarCodigo() {
             onKeyDown={(e) => onKey(i, e)} />
         ))}
         <button ref={btnRef} type="button" aria-label="ENTRAR NA SALA" className="menu-hotspot"
-          style={pos(34.7, 69, 30.9, 13.5)} onClick={tap} />
+          style={pos(34.7, 69, 30.9, 13.5)} onClick={async () => {
+            tap(); const code = chars.join("");
+            if (code.length !== 4 || joining.current || entering) return;
+            joining.current = true; setMessage(null);
+            const error = await join(code);
+            joining.current = false;
+            if (error) setMessage(error); else setEntering(true);
+          }} />
         <Link to="/multijogador" aria-label="VOLTAR" className="menu-hotspot"
           style={pos(3.3, 87, 15.8, 9.4)} onClick={tap} />
         <FadeInFromBlack />
+        {message && <div className="room-message code-message" role="status">{message}</div>}
+        {entering && <RoomEntryTransition onDone={endEntry} />}
       </div>
     </GameShell>
   );
