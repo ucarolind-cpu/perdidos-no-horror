@@ -1,3 +1,3 @@
-- [ ] Criar salas e jogadores reais com identidade segura por aparelho e Realtime preparado.
-- [ ] Integrar criação e saída sem alterar apresentação ou transições.
-- [ ] Limpar salas antigas e testar criação, leitura e exclusão na base.
+- [x] Criar salas e jogadores reais com identidade segura por aparelho e Realtime preparado.
+- [x] Integrar criação e saída sem alterar apresentação ou transições.
+- [x] Limpar salas antigas e testar criação, leitura e exclusão na base.
