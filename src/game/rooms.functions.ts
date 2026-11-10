@@ -28,7 +28,9 @@ export const roomAction = createServerFn({ method: "POST" })
     if (authError || !device) throw new Error("Não foi possível validar este aparelho.");
     const { data: result, error } = await supabaseAdmin.rpc("device_room_action", {
       p_device_id: device.id, p_secret_hash: secretHash, p_action: data.action,
-      p_room_id: data.roomId, p_host_name: data.hostName, p_max_players: data.maxPlayers,
+      p_room_id: data.roomId,
+      ...(data.hostName !== undefined ? { p_host_name: data.hostName } : {}),
+      ...(data.maxPlayers !== undefined ? { p_max_players: data.maxPlayers } : {}),
     });
     if (error) throw new Error("Não foi possível atualizar a sala. Tente novamente.");
     if (data.action === "delete" || result === null) return null;
