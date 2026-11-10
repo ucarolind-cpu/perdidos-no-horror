@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { roomActionSchema, savedRoomSchema } from "./room-contract";
+import { memberActionSchema, roomActionSchema, savedRoomSchema } from "./room-contract";
 
 async function hashSecret(secret: string) {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(secret));
@@ -34,5 +34,24 @@ export const roomAction = createServerFn({ method: "POST" })
     });
     if (error) throw new Error("Não foi possível atualizar a sala. Tente novamente.");
     if (data.action === "delete" || result === null) return null;
-    return savedRoomSchema.parse(result);
+    return { ...savedRoomSchema.parse(result), isHost: true };
+  });
+
+export const memberRoomAction = createServerFn({ method: "POST" })
+  .inputValidator((input) => memberActionSchema.parse(input))
+  .handler(async ({ data }) => {
+    const secretHash = await hashSecret(data.device.secret);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // RPC verifies the device secret and membership inside the locked transaction.
+    const { data: result, error } = await supabaseAdmin.rpc("room_member_action", {
+      p_device_id: data.device.id, p_secret_hash: secretHash, p_action: data.action,
+      ...(data.roomId ? { p_room_id: data.roomId } : {}),
+      ...(data.code ? { p_code: data.code } : {}), ...(data.name ? { p_name: data.name } : {}),
+    });
+    if (error) throw new Error("Não foi possível atualizar a sala. Tente novamente.");
+    if (!result) return { saved: null, error: null };
+    if (typeof result === "object" && !Array.isArray(result) && "error" in result) {
+      return { saved: null, error: result.error === "Sala cheia" ? "Sala cheia" : "Sala não encontrada" };
+    }
+    return { saved: savedRoomSchema.parse(result), error: null };
   });

@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { registerPlayerDevice, roomAction } from "./rooms.functions";
+import { registerPlayerDevice, roomAction, memberRoomAction } from "./rooms.functions";
 import { deviceSchema, type DeviceIdentity, type SavedRoom } from "./room-contract";
 import { getSettings } from "./settings";
 import { session, setRoomOwner } from "./session";
@@ -18,6 +18,13 @@ let activeId: string | null = null;
 let loaded = false;
 let exiting = false;
 let creationInput: { roomId: string; hostName: string; maxPlayers: number } | null = null;
+let menuMessage: string | null = null;
+export function takeRoomMenuMessage() { const message = menuMessage; menuMessage = null; return message; }
+export function closeRemoteRoom() {
+  menuMessage = "O dono saiu da sala";
+  activeId = null; storage.remove(ROOM_KEY); loaded = false; creationInput = null;
+  publish({ saved: null, pending: false, error: null });
+}
 const publish = (patch: Partial<RoomState>) => { state = { ...state, ...patch }; listeners.forEach((fn) => fn()); };
 const subscribe = (fn: () => void) => { listeners.add(fn); return () => { listeners.delete(fn); }; };
 const storage = {
@@ -36,6 +43,7 @@ function storedDevice() {
 export function useRoomActions() {
   const register = useServerFn(registerPlayerDevice);
   const action = useServerFn(roomAction);
+  const member = useServerFn(memberRoomAction);
   const identify = (): Promise<DeviceIdentity> => {
     if (device) return Promise.resolve(device);
     if (devicePending) return devicePending;
@@ -73,7 +81,7 @@ export function useRoomActions() {
     const roomId = activeId;
     publish({ pending: true });
     pending = identify().then(async (identity) => {
-      const saved = await action({ data: { device: identity, action: "read", roomId } });
+      const { saved } = await member({ data: { device: identity, action: "read", roomId } });
       publish({ saved, pending: false });
       if (!saved) { activeId = null; storage.remove(ROOM_KEY); }
     }).catch(() => publish({ pending: false, error: "Não foi possível consultar a sala. Toque no olho para tentar novamente." }))
@@ -85,7 +93,8 @@ export function useRoomActions() {
     try {
       await pending;
       if (activeId) {
-        await action({ data: { device: await identify(), action: "delete", roomId: activeId } });
+        if (state.saved?.isHost === false) await member({ data: { device: await identify(), action: "leave", roomId: activeId } });
+        else await action({ data: { device: await identify(), action: "delete", roomId: activeId } });
       }
       activeId = null; storage.remove(ROOM_KEY); loaded = false; creationInput = null;
       publish({ saved: null, pending: false, error: null });
@@ -97,5 +106,30 @@ export function useRoomActions() {
     } finally { exiting = false; }
   };
   const retry = () => { if (state.error && !pending) { if (state.saved || !creationInput) { loaded = false; restore(); } else create(true); } };
-  return { create, restore, leave, retry };
+  const join = async (code: string) => {
+    if (code.length !== 4 || pending || exiting) return null;
+    publish({ pending: true, error: null });
+    let message: string | null = null;
+    pending = identify().then(async (identity) => {
+      const result = await member({ data: { device: identity, action: "join", code, name: getSettings().playerName } });
+      message = result.error;
+      if (result.saved) {
+        loaded = true; activeId = result.saved.room.id; storage.write(ROOM_KEY, activeId);
+        creationInput = null;
+        publish({ saved: result.saved, pending: false, error: null });
+      } else publish({ pending: false, error: result.error });
+    }).catch(() => { message = "Não foi possível entrar. Tente novamente."; publish({ pending: false, error: message }); })
+      .finally(() => { pending = null; });
+    await pending;
+    return message;
+  };
+  const refresh = async () => {
+    if (!activeId || exiting) return true;
+    const { saved } = await member({ data: { device: await identify(), action: "heartbeat", roomId: activeId } });
+    if (!saved) return false;
+    // Heartbeats do not rerender the scenery or even the list unless visible data changes.
+    if (JSON.stringify(saved) !== JSON.stringify(state.saved)) publish({ saved, error: null });
+    return true;
+  };
+  return { create, restore, leave, retry, join, refresh };
 }

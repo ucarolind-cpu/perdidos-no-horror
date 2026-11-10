@@ -15,6 +15,13 @@
       "when": 1794186118589,
       "tag": "0001_enable_room_cleanup_scheduler",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794278003413,
+      "tag": "0002_room_join_realtime_and_presence",
+      "breakpoints": true
     }
   ]
 }
