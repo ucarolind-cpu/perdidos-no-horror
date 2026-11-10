@@ -1,3 +1,3 @@
-- [x] Criar salas e jogadores reais com identidade segura por aparelho e Realtime preparado.
-- [x] Integrar criação e saída sem alterar apresentação ou transições.
-- [x] Limpar salas antigas e testar criação, leitura e exclusão na base.
+- [ ] Entrada por código com limite, identificação e animação existente.
+- [ ] Lista em tempo real e saída do dono ou participante.
+- [ ] Remoção de desconectados e testes em dois navegadores.
