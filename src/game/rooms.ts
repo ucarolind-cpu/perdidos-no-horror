@@ -17,6 +17,7 @@ let pending: Promise<void> | null = null;
 let activeId: string | null = null;
 let loaded = false;
 let exiting = false;
+let creationInput: { roomId: string; hostName: string; maxPlayers: number } | null = null;
 const publish = (patch: Partial<RoomState>) => { state = { ...state, ...patch }; listeners.forEach((fn) => fn()); };
 const subscribe = (fn: () => void) => { listeners.add(fn); return () => { listeners.delete(fn); }; };
 const storage = {
@@ -27,29 +28,33 @@ const storage = {
 
 export function useRoomState() { return useSyncExternalStore(subscribe, () => state, () => EMPTY); }
 
+function storedDevice() {
+  try { return deviceSchema.safeParse(JSON.parse(storage.read(DEVICE_KEY) ?? "null")); }
+  catch { return deviceSchema.safeParse(null); }
+}
+
 export function useRoomActions() {
   const register = useServerFn(registerPlayerDevice);
   const action = useServerFn(roomAction);
   const identify = (): Promise<DeviceIdentity> => {
     if (device) return Promise.resolve(device);
     if (devicePending) return devicePending;
-    try {
-      const saved = deviceSchema.safeParse(JSON.parse(storage.read(DEVICE_KEY) ?? "null"));
-      if (saved.success) { device = saved.data; return Promise.resolve(device); }
-    } catch { /* identificador ausente ou inválido */ }
+    const saved = storedDevice();
+    if (saved.success) { device = saved.data; return Promise.resolve(device); }
     devicePending = register().then((value) => {
       device = value; storage.write(DEVICE_KEY, JSON.stringify(value)); return value;
     }).finally(() => { devicePending = null; });
     return devicePending;
   };
-  const create = () => {
+  const create = (retrying = false) => {
     if (pending || exiting) return;
     loaded = true;
-    activeId = crypto.randomUUID();
+    if (!retrying || !creationInput) {
+      creationInput = { roomId: crypto.randomUUID(), hostName: getSettings().playerName, maxPlayers: session.playerCount };
+    }
+    activeId = creationInput.roomId;
     storage.write(ROOM_KEY, activeId);
-    const roomId = activeId;
-    const hostName = getSettings().playerName;
-    const maxPlayers = session.playerCount;
+    const { roomId, hostName, maxPlayers } = creationInput;
     setRoomOwner();
     publish({ saved: null, pending: true, error: null });
     // Microtask keeps credential/network work out of the animation click handler.
@@ -64,7 +69,7 @@ export function useRoomActions() {
     if (loaded || pending) return;
     loaded = true;
     activeId = storage.read(ROOM_KEY);
-    if (!activeId || !deviceSchema.safeParse(JSON.parse(storage.read(DEVICE_KEY) ?? "null")).success) return;
+    if (!activeId || !storedDevice().success) return;
     const roomId = activeId;
     publish({ pending: true });
     pending = identify().then(async (identity) => {
@@ -82,7 +87,7 @@ export function useRoomActions() {
       if (activeId) {
         await action({ data: { device: await identify(), action: "delete", roomId: activeId } });
       }
-      activeId = null; storage.remove(ROOM_KEY); loaded = false;
+      activeId = null; storage.remove(ROOM_KEY); loaded = false; creationInput = null;
       publish({ saved: null, pending: false, error: null });
       session.owner = null;
       return true;
@@ -91,6 +96,6 @@ export function useRoomActions() {
       return false;
     } finally { exiting = false; }
   };
-  const retry = () => { if (state.error && !pending) { if (state.saved) { loaded = false; restore(); } else create(); } };
+  const retry = () => { if (state.error && !pending) { if (state.saved || !creationInput) { loaded = false; restore(); } else create(true); } };
   return { create, restore, leave, retry };
 }
