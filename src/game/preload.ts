@@ -1,6 +1,16 @@
 import door from "@/assets/door-scene.jpg.asset.json";
 import matchstick from "@/assets/matchstick_strike.mp3.asset.json";
+import menuBackground from "@/assets/menu-bg.jpg.asset.json";
+import playersBackground from "@/assets/jogadores-bg.jpg.asset.json";
+import multiplayerBackground from "@/assets/multijogador-bg.jpg.asset.json";
+import codeBackground from "@/assets/codigo-bg.jpg.asset.json";
+import settingsBackground from "@/assets/settings-bg.jpg.asset.json";
 import lobbyBackground from "@/assets/espera-bg.jpg.asset.json";
+import lobbyTitle from "@/assets/lobby-title.png.asset.json";
+import lobbyCode from "@/assets/lobby-code.png.asset.json";
+import lobbyEye from "@/assets/lobby-eye.png.asset.json";
+import lobbyButton1 from "@/assets/lobby-btn1.png.asset.json";
+import lobbyButton2 from "@/assets/lobby-btn2.png.asset.json";
 import lobbyMusic from "@/assets/sala-espera-musica.mp3.asset.json";
 import ownerSprite from "@/assets/room-owner.webp.asset.json";
 
@@ -8,6 +18,59 @@ const images = new Map<string, HTMLImageElement>();
 const audio = new Map<string, HTMLAudioElement>();
 const imageLoads = new Map<string, Promise<HTMLImageElement | null>>();
 const readyImages = new Map<string, HTMLImageElement>();
+
+// Screen art is warmed gradually in the background, never as a burst of requests.
+const screenImageUrls = [
+  menuBackground.url,
+  playersBackground.url,
+  multiplayerBackground.url,
+  codeBackground.url,
+  settingsBackground.url,
+  door.url,
+  lobbyBackground.url,
+  lobbyTitle.url,
+  lobbyCode.url,
+  lobbyEye.url,
+  lobbyButton1.url,
+  lobbyButton2.url,
+  ownerSprite.url,
+];
+let screenPreloadStarted = false;
+let screenPreloadIndex = 0;
+
+function scheduleIdle(task: () => void) {
+  if (typeof window === "undefined") return;
+  const idleWindow = window as Window & {
+    requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+  };
+  if (idleWindow.requestIdleCallback) {
+    idleWindow.requestIdleCallback(task, { timeout: 2500 });
+  } else {
+    window.setTimeout(task, 900);
+  }
+}
+
+/** Loads every screen's visual assets one by one during idle time to avoid mobile jank. */
+export function preloadAllScreenImages() {
+  if (typeof window === "undefined" || screenPreloadStarted) return;
+  screenPreloadStarted = true;
+
+  const loadNext = () => {
+    if (screenPreloadIndex >= screenImageUrls.length) return;
+    if (document.visibilityState === "hidden") {
+      document.addEventListener("visibilitychange", loadNext, { once: true });
+      return;
+    }
+
+    const url = screenImageUrls[screenPreloadIndex++];
+    void preloadImage(url).finally(() => {
+      // Yield between images so rendering and touch input keep priority on phones.
+      window.setTimeout(() => scheduleIdle(loadNext), 180);
+    });
+  };
+
+  scheduleIdle(loadNext);
+}
 
 export function preloadImage(url: string) {
   if (typeof window === "undefined") return Promise.resolve(null);
@@ -19,6 +82,7 @@ export function preloadImage(url: string) {
   try {
     const image = new Image();
     image.decoding = "async";
+    image.fetchPriority = "low";
     image.onload = async () => {
       try { await image.decode?.(); } catch { /* loaded image remains usable */ }
       image.onload = null;
