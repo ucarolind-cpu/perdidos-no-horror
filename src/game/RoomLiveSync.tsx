@@ -20,6 +20,7 @@ export function RoomLiveSync() {
       checking = true;
       try {
         if (!await refresh() && active) {
+          active = false;
           closeRemoteRoom(); await navigate({ to: "/multijogador" });
         }
       } catch { /* heartbeat retries transient network failures */ }

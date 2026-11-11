@@ -19,7 +19,7 @@ let loaded = false;
 let exiting = false;
 let creationInput: { roomId: string; hostName: string; maxPlayers: number } | null = null;
 let menuMessage: string | null = null;
-export function takeRoomMenuMessage() { const message = menuMessage; menuMessage = null; return message; }
+export function takeRoomMenuMessage() { return menuMessage; }
 export function closeRemoteRoom() {
   menuMessage = "O dono saiu da sala";
   activeId = null; storage.remove(ROOM_KEY); loaded = false; creationInput = null;
@@ -55,6 +55,7 @@ export function useRoomActions() {
     return devicePending;
   };
   const create = (retrying = false) => {
+    menuMessage = null;
     if (pending || exiting) return;
     loaded = true;
     if (!retrying || !creationInput) {
@@ -107,6 +108,7 @@ export function useRoomActions() {
   };
   const retry = () => { if (state.error && !pending) { if (state.saved || !creationInput) { loaded = false; restore(); } else create(true); } };
   const join = async (code: string) => {
+    menuMessage = null;
     if (code.length !== 4 || pending || exiting) return null;
     publish({ pending: true, error: null });
     let message: string | null = null;
