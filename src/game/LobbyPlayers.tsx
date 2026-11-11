@@ -10,7 +10,7 @@ export function LobbyPlayers() {
       const player = saved?.players[i];
       return <li key={i}>
         <span className="lobby-avatar"><User /></span>
-        {player ? <span className="lobby-owner-identity"><span className="lobby-owner-name">{player.player_name}</span><span className="lobby-wait">- Aguardando...</span></span>
+        {player ? <span className="lobby-owner-identity"><span className="lobby-owner-name">{player.player_name}</span></span>
           : <><span>[player]</span><span className="lobby-wait">&nbsp;- Aguardando...</span></>}
       </li>;
     })}</ul>
