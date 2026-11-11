@@ -2,8 +2,8 @@ import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { roomActionSchema, savedRoomSchema } from "@/game/room-contract";
 
-const mocks = vi.hoisted(() => ({ register: vi.fn(), action: vi.fn() }));
-vi.mock("@/game/rooms.functions", () => ({ registerPlayerDevice: mocks.register, roomAction: mocks.action }));
+const mocks = vi.hoisted(() => ({ register: vi.fn(), action: vi.fn(), member: vi.fn() }));
+vi.mock("@/game/rooms.functions", () => ({ registerPlayerDevice: mocks.register, roomAction: mocks.action, memberRoomAction: mocks.member }));
 vi.mock("@tanstack/react-start", () => ({ useServerFn: (fn: unknown) => fn }));
 const id = "a54f70e5-8304-4d33-9dad-df9154e3d201";
 const credentials = { id, secret: "a".repeat(64) };
@@ -12,7 +12,7 @@ const saved = {
   room: { id, code: "A2Z9", host_player_id: id, host_name: "ANA", max_players: 4, status: "aguardando", created_at: "2026-11-09T01:00:00Z" },
   players: [{ room_id: id, player_id: id, player_name: "ANA", is_host: true, joined_at: "2026-11-09T01:00:00Z" }],
 };
-beforeEach(() => { vi.resetModules(); vi.clearAllMocks(); localStorage.clear(); mocks.register.mockResolvedValue(credentials); mocks.action.mockResolvedValue(saved); });
+beforeEach(() => { vi.resetModules(); vi.clearAllMocks(); localStorage.clear(); mocks.register.mockResolvedValue(credentials); mocks.action.mockResolvedValue(saved); mocks.member.mockResolvedValue({ saved: { ...saved, isHost: false }, error: null }); });
 afterEach(cleanup);
 
 describe("Regras das salas reais", () => {
@@ -74,5 +74,35 @@ describe("Regras das salas reais", () => {
     await act(async () => { result.current.retry(); });
     expect(mocks.action.mock.calls[1]?.[0]).toEqual(mocks.action.mock.calls[0]?.[0]);
     expect(result.current.state.error).toBeNull();
+  });
+  it("código incompleto não consulta nem registra aparelho", async () => {
+    const { useRoomActions } = await import("@/game/rooms");
+    const { result } = renderHook(useRoomActions);
+    await act(async () => { await result.current.join("A2Z"); });
+    expect(mocks.member).not.toHaveBeenCalled(); expect(mocks.register).not.toHaveBeenCalled();
+  });
+  it("entrada usa o nome configurado e saída do convidado remove só a participação", async () => {
+    const { updateSettings } = await import("@/game/settings"); updateSettings({ playerName: "BIA" });
+    const { useRoomActions, useRoomState } = await import("@/game/rooms");
+    const { result } = renderHook(() => ({ ...useRoomActions(), state: useRoomState() }));
+    await act(async () => { expect(await result.current.join("A2Z9")).toBeNull(); });
+    expect(mocks.member).toHaveBeenCalledWith({ data: { device: credentials, action: "join", code: "A2Z9", name: "BIA" } });
+    expect(result.current.state.saved?.isHost).toBe(false);
+    await act(async () => { await result.current.leave(); });
+    expect(mocks.member).toHaveBeenLastCalledWith({ data: { device: credentials, action: "leave", roomId: id } });
+    expect(mocks.action).not.toHaveBeenCalled();
+  });
+  it("recusa sala cheia sem guardar participação", async () => {
+    mocks.member.mockResolvedValue({ saved: null, error: "Sala cheia" });
+    const { useRoomActions, useRoomState } = await import("@/game/rooms");
+    const { result } = renderHook(() => ({ ...useRoomActions(), state: useRoomState() }));
+    await act(async () => { expect(await result.current.join("A2Z9")).toBe("Sala cheia"); });
+    expect(result.current.state.saved).toBeNull(); expect(localStorage.getItem("pnh-active-room-v1")).toBeNull();
+  });
+  it("sala inexistente não guarda participação", async () => {
+    mocks.member.mockResolvedValue({ saved: null, error: "Sala não encontrada" });
+    const { useRoomActions } = await import("@/game/rooms"); const { result } = renderHook(useRoomActions);
+    await act(async () => { expect(await result.current.join("ZZZZ")).toBe("Sala não encontrada"); });
+    expect(localStorage.getItem("pnh-active-room-v1")).toBeNull();
   });
 });
