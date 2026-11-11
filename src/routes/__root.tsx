@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { preloadAllScreenImages } from "@/game/preload";
 
 function NotFoundComponent() {
   return (
@@ -119,6 +120,10 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    preloadAllScreenImages();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
