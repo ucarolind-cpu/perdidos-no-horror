@@ -20,8 +20,9 @@ export function DoorTransition({ onDone }: { onDone: () => void }) {
       if (done.current) return;
       done.current = true;
       transition.fadeInNext = true;
-      onDone();
-      navigate({ to: "/multijogador" });
+      // Do not clear the transition component before navigation: doing so
+      // reveals the previous screen for a frame while the next route mounts.
+      void navigate({ to: "/multijogador" }).then(onDone);
     };
     const raf = requestAnimationFrame(() => setBlackOn(true)); // fade to black 0.5s
     at(520, () => { setPhase("scene"); setBlackOn(false); }); // fade in door scene 0.5s
