@@ -15,6 +15,7 @@ import lobbyMusic from "@/assets/sala-espera-musica.mp3.asset.json";
 import { vibrate } from "@/game/settings";
 import { useRoomActions, useRoomState } from "@/game/rooms";
 import { RoomOwner } from "@/game/RoomOwner";
+import { LobbyCharacters } from "@/game/LobbyCharacters";
 import { FadeInFromBlack } from "@/game/DoorTransition";
 
 export const Route = createFileRoute("/sala-espera")({
@@ -45,6 +46,7 @@ function SalaEspera() {
       <div className="game-stage lobby">
         <img src={bg.url} alt="" className="game-bg" draggable={false} />
         <RoomOwner />
+        <LobbyCharacters />
         <RoomLiveSync />
         <h1 className="wood-plank lobby-skin lobby-title" style={skin(skinTitle.url)}>SALA DE ESPERA</h1>
         <LobbyCode retry={retry} />
