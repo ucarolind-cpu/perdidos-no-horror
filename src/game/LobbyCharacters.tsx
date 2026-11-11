@@ -1,15 +1,18 @@
 import { useRoomState } from "./rooms";
 
+// Anchors are measured against the 16:9 lobby artwork. Each character is
+// bottom-aligned to the center of its own floor platform.
 const guestSlots = [
-  { left: "51.8%", bottom: "26%", width: "7.2%", height: "19.4%" },
-  { left: "40.2%", bottom: "26%", width: "7.2%", height: "19.4%" },
-  { left: "62.1%", bottom: "32.5%", width: "5.2%", height: "14%" },
-  { left: "32.7%", bottom: "32.5%", width: "5.2%", height: "14%" },
+  { left: "57.1%", bottom: "30.2%", height: "33.2%", zIndex: 2 },
+  { left: "42.9%", bottom: "30.2%", height: "33.2%", zIndex: 2 },
+  { left: "63.1%", bottom: "39.2%", height: "22.2%", zIndex: 1 },
+  { left: "35.2%", bottom: "39.2%", height: "22.2%", zIndex: 1 },
 ];
 
-/** Guests use their stable join order, never their display name, to select a platform. */
 export function LobbyCharacters() {
   const { saved } = useRoomState();
+  // The host already has RoomOwner. Guests are ordered by joined_at by the
+  // room RPC, so platform assignment is independent of their display names.
   const guests = saved?.players.filter((player) => !player.is_host).slice(0, 4) ?? [];
 
   return (
@@ -22,7 +25,10 @@ export function LobbyCharacters() {
             key={player.player_id}
             className="lobby-character"
             style={{
-              ...slot,
+              left: slot.left,
+              bottom: slot.bottom,
+              height: slot.height,
+              zIndex: slot.zIndex,
               backgroundPosition: `${index * (100 / 3)}% bottom`,
             }}
           />
