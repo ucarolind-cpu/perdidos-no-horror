@@ -1,3 +1,3 @@
-- [ ] Entrada por código com limite, identificação e animação existente.
-- [ ] Lista em tempo real e saída do dono ou participante.
-- [ ] Remoção de desconectados e testes em dois navegadores.
+- [x] Entrada por código com limite, identificação e animação existente.
+- [x] Lista em tempo real e saída do dono ou participante.
+- [x] Remoção de desconectados e testes em dois navegadores.
