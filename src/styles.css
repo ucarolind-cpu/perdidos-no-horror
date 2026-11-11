@@ -353,3 +353,13 @@ input.wood-field { width: 100%; text-align: center; outline: none; border-color:
 
 /* O palco mantém a proporção original; áreas externas ficam pretas, sem duplicar ou ampliar o cenário. */
 .game-root { background: #000; }
+
+/* Personagens dos convidados: sprite sheet transparente em quatro colunas. */
+.lobby-characters { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.lobby-character {
+  position: absolute;
+  background-image: url("/lobby-players-sheet.png");
+  background-repeat: no-repeat;
+  background-size: 400% 100%;
+  filter: drop-shadow(0 0.25cqh 0.45cqh oklch(0 0 0 / .55));
+}
