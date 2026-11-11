@@ -51,7 +51,7 @@ export const memberRoomAction = createServerFn({ method: "POST" })
     if (error) throw new Error("Não foi possível atualizar a sala. Tente novamente.");
     if (!result) return { saved: null, error: null };
     if (typeof result === "object" && !Array.isArray(result) && "error" in result) {
-      return { saved: null, error: result.error === "Sala cheia" ? "Sala cheia" : "Sala não encontrada" };
+      return { saved: null, error: result['error'] === "Sala cheia" ? "Sala cheia" : "Sala não encontrada" };
     }
     return { saved: savedRoomSchema.parse(result), error: null };
   });
