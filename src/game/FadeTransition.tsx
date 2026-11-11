@@ -30,8 +30,9 @@ export function FadeToBlack({ to, onDone, holdMs = 0, safetyMs = 2000, blackSoun
       done.current = true;
       transition.fadeInNext = true;
       transition.fadeInMs = 300;
-      onDone();
-      navigate({ to });
+      // Keep the black overlay mounted until the router has committed the next
+      // route. Clearing the parent state first briefly exposed the old screen.
+      void navigate({ to }).then(onDone);
     };
     const raf = requestAnimationFrame(() => requestAnimationFrame(() => setOn(true)));
     const t1 = window.setTimeout(finish, 320 + holdMs);
