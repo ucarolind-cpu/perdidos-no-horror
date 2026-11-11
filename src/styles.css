@@ -279,7 +279,7 @@ input.wood-field { width: 100%; text-align: center; outline: none; border-color:
 /* ===== Sala de espera ===== */
 .lobby { font-family: var(--font-game); color: var(--game-parchment); }
 .lobby-owner {
-  position: absolute; left: 45.06%; bottom: 19.66%; width: 9.75%;
+  position: absolute; left: 45.06%; bottom: 19.66%; width: 9.75%; z-index: 3;
   aspect-ratio: 134 / 310; pointer-events: none;
 }
 .lobby-owner-image { display: block; width: 100%; height: 100%; object-fit: contain; }
@@ -355,9 +355,12 @@ input.wood-field { width: 100%; text-align: center; outline: none; border-color:
 .game-root { background: #000; }
 
 /* Personagens dos convidados: sprite sheet transparente em quatro colunas. */
-.lobby-characters { position: absolute; inset: 0; pointer-events: none; }
+.lobby-characters { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 .lobby-character {
   position: absolute;
+  width: auto;
+  aspect-ratio: 52 / 140;
+  transform: translateX(-50%);
   background-image: url("/lobby-players-sheet.png");
   background-repeat: no-repeat;
   background-size: 400% 100%;
