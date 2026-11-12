@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { closeRemoteRoom, useRoomActions, useRoomState } from "./rooms";
+import { playOneShotSfx } from "./audio";
 
 /** Data-free Realtime doorbells on an unguessable capability topic.
  * All actual reads remain credential/membership-checked server calls. */
@@ -10,6 +11,11 @@ export function RoomLiveSync() {
   const { refresh } = useRoomActions();
   const navigate = useNavigate();
   const topic = saved?.room.realtime_topic;
+  useEffect(() => {
+    const onPlayerJoined = () => playOneShotSfx("/audio/lobby-player-join.mp3");
+    window.addEventListener("pnh:room-player-joined", onPlayerJoined);
+    return () => window.removeEventListener("pnh:room-player-joined", onPlayerJoined);
+  }, []);
   useEffect(() => {
     if (!topic) return;
     let active = true;
