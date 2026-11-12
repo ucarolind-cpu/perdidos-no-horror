@@ -54,7 +54,7 @@ function PlayerCount() {
           ),
         )}
         <Link to="/" aria-label="VOLTAR" className="menu-hotspot" style={pos(3.3, 87, 15.8, 9.1)} onClick={tap} />
-        {busy && <DoorTransition to="/cor" onDone={end} />}
+        {busy && <DoorTransition to="/multijogador" onDone={end} />}
         <FadeInFromBlack />
       </div>
     </GameShell>
