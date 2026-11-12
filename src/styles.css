@@ -366,3 +366,29 @@ input.wood-field { width: 100%; text-align: center; outline: none; border-color:
   background-size: 400% 100%;
   filter: drop-shadow(0 0.25cqh 0.45cqh oklch(0 0 0 / .55));
 }
+
+
+/* Contagem regressiva de início da partida */
+.lobby-countdown {
+  position: absolute;
+  z-index: 20;
+  top: 3.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 12cqh;
+  height: 15cqh;
+  display: grid;
+  place-items: center;
+  color: #b9a083;
+  font: 900 13cqh/1 Georgia, serif;
+  letter-spacing: -0.06em;
+  text-shadow:
+    0 2px 0 #24170f,
+    0 4px 0 #4a3020,
+    0 7px 8px #000,
+    0 0 2cqh oklch(0.68 0.12 65 / .45);
+  -webkit-text-stroke: 1px #38251a;
+  pointer-events: none;
+  user-select: none;
+}
+.lobby-btn:disabled { opacity: .55; cursor: default; }
