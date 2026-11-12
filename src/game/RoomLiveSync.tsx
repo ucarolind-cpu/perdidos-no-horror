@@ -12,7 +12,7 @@ export function RoomLiveSync() {
   const navigate = useNavigate();
   const topic = saved?.room.realtime_topic;
   useEffect(() => {
-    const onPlayerJoined = () => playOneShotSfx("/audio/lobby-player-join.mp3");
+    const onPlayerJoined = () => playOneShotSfx("/378558__cawawac__asoada-impact-low-tube.wav");
     window.addEventListener("pnh:room-player-joined", onPlayerJoined);
     return () => window.removeEventListener("pnh:room-player-joined", onPlayerJoined);
   }, []);
