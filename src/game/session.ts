@@ -26,12 +26,21 @@ const PLAYER_COLOR_KEY = "pnh-player-color";
 
 export function getPlayerColor(): PlayerColor {
   if (typeof window === "undefined") return "blue";
-  const saved = localStorage.getItem(PLAYER_COLOR_KEY);
-  return saved === "green" || saved === "orange" || saved === "blue" || saved === "white" || saved === "pink"
-    ? saved
-    : "blue";
+  try {
+    const saved = localStorage.getItem(PLAYER_COLOR_KEY);
+    return saved === "green" || saved === "orange" || saved === "blue" || saved === "white" || saved === "pink"
+      ? saved
+      : "blue";
+  } catch {
+    return "blue";
+  }
 }
 
 export function setPlayerColor(color: PlayerColor) {
-  if (typeof window !== "undefined") localStorage.setItem(PLAYER_COLOR_KEY, color);
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(PLAYER_COLOR_KEY, color);
+  } catch {
+    /* armazenamento indisponível */
+  }
 }
