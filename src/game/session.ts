@@ -19,3 +19,19 @@ const ROOM_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 export function randomRoomCode() {
   return Array.from({ length: 4 }, () => ROOM_CHARS[Math.floor(Math.random() * ROOM_CHARS.length)]).join("");
 }
+
+
+export type PlayerColor = "green" | "orange" | "blue" | "white" | "pink";
+const PLAYER_COLOR_KEY = "pnh-player-color";
+
+export function getPlayerColor(): PlayerColor {
+  if (typeof window === "undefined") return "blue";
+  const saved = localStorage.getItem(PLAYER_COLOR_KEY);
+  return saved === "green" || saved === "orange" || saved === "blue" || saved === "white" || saved === "pink"
+    ? saved
+    : "blue";
+}
+
+export function setPlayerColor(color: PlayerColor) {
+  if (typeof window !== "undefined") localStorage.setItem(PLAYER_COLOR_KEY, color);
+}
