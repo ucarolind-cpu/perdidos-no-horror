@@ -46,12 +46,13 @@ export const memberRoomAction = createServerFn({ method: "POST" })
     const { data: result, error } = await supabaseAdmin.rpc("room_member_action", {
       p_device_id: data.device.id, p_secret_hash: secretHash, p_action: data.action,
       ...(data.roomId ? { p_room_id: data.roomId } : {}),
-      ...(data.code ? { p_code: data.code } : {}), ...(data.name ? { p_name: data.name } : {}),
+      ...(data.code ? { p_code: data.code } : {}), ...(data.name ? { p_name: data.name } : {}), ...(data.gameMode !== undefined ? { p_game_mode: data.gameMode } : {}),
     });
     if (error) throw new Error("Não foi possível atualizar a sala. Tente novamente.");
     if (!result) return { saved: null, error: null };
     if (typeof result === "object" && !Array.isArray(result) && "error" in result) {
-      return { saved: null, error: result['error'] === "Sala cheia" ? "Sala cheia" : "Sala não encontrada" };
+      const serverError = result["error"];
+      return { saved: null, error: typeof serverError === "string" ? serverError : "Sala não encontrada" };
     }
     return { saved: savedRoomSchema.parse(result), error: null };
   });
