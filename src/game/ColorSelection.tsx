@@ -23,6 +23,7 @@ const colorButtons: { id: PlayerColor; className: string; label: string }[] = [
 
 export function ColorSelection() {
   const [selected, setSelected] = useState<PlayerColor>(() => getPlayerColor());
+  const [confirmActivated, setConfirmActivated] = useState(false);
 
   useEffect(() => {
     for (const image of Object.values(colorImages)) void preloadImage(image);
@@ -39,6 +40,7 @@ export function ColorSelection() {
   const confirm = () => {
     playClick();
     vibrate(25);
+    setConfirmActivated(true);
   };
 
   return (
@@ -65,7 +67,7 @@ export function ColorSelection() {
       <button
         type="button"
         aria-label="Confirmar cor"
-        className="color-confirm"
+        className={`color-confirm${confirmActivated ? " is-activated" : ""}`}
         onClick={confirm}
       />
       <FadeInFromBlack />
