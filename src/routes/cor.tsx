@@ -34,11 +34,12 @@ const positions: Record<PlayerColor, string> = {
 };
 
 function ColorSelection() {
-  const [selected, setSelected] = useState<PlayerColor>(() => getPlayerColor());
+  const [selected, setSelected] = useState<PlayerColor>("blue");
   const [busy, setBusy] = useState(false);
   const end = useCallback(() => setBusy(false), []);
 
   useEffect(() => {
+    setSelected(getPlayerColor());
     void preloadImage("/color-select-bg.webp");
     void preloadImage("/color-characters.png");
   }, []);
