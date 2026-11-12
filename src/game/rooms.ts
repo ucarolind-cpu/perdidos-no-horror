@@ -128,7 +128,11 @@ export function useRoomActions() {
   const refresh = async () => {
     if (!activeId || exiting) return true;
     const identity = await identify();
-    const { saved } = await member({ data: { device: identity, action: "heartbeat", roomId: activeId } });
+    const heartbeat = await member({ data: { device: identity, action: "heartbeat", roomId: activeId } });
+    // A failed heartbeat is not proof that the room was closed. Only an explicit
+    // successful response with no membership should trigger the remote-close flow.
+    if (heartbeat.error) throw new Error(heartbeat.error);
+    const { saved } = heartbeat;
     if (!saved) return false;
     // Detect only genuinely new guest IDs against an already-established room snapshot.
     // The joining device already has itself in its join response, so it never emits a join sound.
