@@ -52,7 +52,11 @@ function SalaEspera() {
       const timer = window.setInterval(update, 100);
     };
     window.addEventListener("pnh:room-countdown-start", onStart);
-    return () => window.removeEventListener("pnh:room-countdown-start", onStart);
+    window.addEventListener("pnh:room-countdown-started", onStart);
+    return () => {
+      window.removeEventListener("pnh:room-countdown-start", onStart);
+      window.removeEventListener("pnh:room-countdown-started", onStart);
+    };
   }, []);
   const navigate = useNavigate();
   useEffect(() => { restore(); }, []);
