@@ -456,11 +456,9 @@ input.wood-field { width: 100%; text-align: center; outline: none; border-color:
   -webkit-tap-highlight-color: transparent;
 }
 .color-confirm:hover,
-.color-confirm:focus,
-.color-confirm:focus-visible {
-  outline: 2px solid #fff0c9;
-  outline-offset: -0.6cqh;
-  filter: brightness(1.18);
+.color-confirm:focus-visible,
+.color-confirm.is-activated {
+  outline: none;
   background: color-mix(in oklab, var(--game-ember) 10%, transparent);
   box-shadow: 0 0 24px color-mix(in oklab, var(--game-ember) 45%, transparent);
 }
