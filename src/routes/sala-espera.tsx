@@ -107,6 +107,7 @@ function ColorSelection() {
   return (
     <div className="game-stage color-select-screen">
       <img src="/color-select-bg.webp" alt="" className="game-bg" draggable={false} />
+      <img src="/color-blue-button.webp" alt="" className="color-blue-button-cleanup" draggable={false} />
       <div
         className="color-character-preview"
         style={{ backgroundPosition: `${chosen.position} center` }}
