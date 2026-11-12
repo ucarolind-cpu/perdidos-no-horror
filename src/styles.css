@@ -395,14 +395,15 @@ input.wood-field { width: 100%; text-align: center; outline: none; border-color:
 
 
 /* Seleção de cor — arte de referência com botões de madeira e sprites originais. */
+.color-blue-button-cleanup { position:absolute; z-index:1; left:56.97%; top:41.99%; width:20.51%; height:15.17%; pointer-events:none; }
 .color-select-screen { font-family: var(--font-game); color: var(--game-parchment); }
 .color-character-preview {
   position: absolute;
   z-index: 2;
-  left: 45%;
-  top: 39.5%;
-  width: 10%;
-  height: 41%;
+  left: 44.91%;
+  top: 39.49%;
+  width: 10.78%;
+  height: 41.62%;
   background-image: url("/color-characters.png");
   background-repeat: no-repeat;
   background-size: 500% 100%;
