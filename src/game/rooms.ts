@@ -127,7 +127,8 @@ export function useRoomActions() {
   };
   const refresh = async () => {
     if (!activeId || exiting) return true;
-    const { saved } = await member({ data: { device: await identify(), action: "heartbeat", roomId: activeId } });
+    const identity = await identify();
+    const { saved } = await member({ data: { device: identity, action: "heartbeat", roomId: activeId } });
     if (!saved) return false;
     // Detect only genuinely new guest IDs against an already-established room snapshot.
     // The joining device already has itself in its join response, so it never emits a join sound.
