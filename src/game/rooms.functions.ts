@@ -52,7 +52,7 @@ export const memberRoomAction = createServerFn({ method: "POST" })
       const { data: result, error } = await supabaseAdmin.rpc("room_member_action", {
         p_device_id: data.device.id, p_secret_hash: secretHash, p_action: data.action,
         ...(data.roomId ? { p_room_id: data.roomId } : {}),
-        ...(data.code ? { p_code: data.code } : {}), ...(data.name ? { p_name: data.name } : {}), ...(data.gameMode !== undefined ? { p_game_mode: data.gameMode } : {}),
+        ...(data.code ? { p_code: data.code } : {}), ...(data.name ? { p_name: data.name } : {}),
       });
       if (error) {
         console.error("[Rooms] room_member_action failed:", { code: error.code, message: error.message, details: error.details, hint: error.hint });
