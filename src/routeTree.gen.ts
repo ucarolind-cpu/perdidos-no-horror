@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
+import { Route as CorRouteImport } from './routes/cor'
 import { Route as EntrarCodigoRouteImport } from './routes/entrar-codigo'
 import { Route as JogadoresRouteImport } from './routes/jogadores'
 import { Route as MultijogadorRouteImport } from './routes/multijogador'
@@ -24,6 +25,11 @@ const IndexRoute = IndexRouteImport.update({
 const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
   id: '/configuracoes',
   path: '/configuracoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CorRoute = CorRouteImport.update({
+  id: '/cor',
+  path: '/cor',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EntrarCodigoRoute = EntrarCodigoRouteImport.update({
@@ -50,6 +56,9 @@ const SalaEsperaRoute = SalaEsperaRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
+  '/cor': typeof CorRoute
+  '/cor': typeof CorRoute
+  '/cor': typeof CorRoute
   '/entrar-codigo': typeof EntrarCodigoRoute
   '/jogadores': typeof JogadoresRoute
   '/multijogador': typeof MultijogadorRoute
@@ -77,6 +86,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/configuracoes'
+    | '/cor'
+    | '/cor'
+    | '/cor'
     | '/entrar-codigo'
     | '/jogadores'
     | '/multijogador'
@@ -102,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConfiguracoesRoute: typeof ConfiguracoesRoute
+  CorRoute: typeof CorRoute
   EntrarCodigoRoute: typeof EntrarCodigoRoute
   JogadoresRoute: typeof JogadoresRoute
   MultijogadorRoute: typeof MultijogadorRoute
@@ -122,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/configuracoes'
       fullPath: '/configuracoes'
       preLoaderRoute: typeof ConfiguracoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cor': {
+      id: '/cor'
+      path: '/cor'
+      fullPath: '/cor'
+      preLoaderRoute: typeof CorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/entrar-codigo': {
@@ -158,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConfiguracoesRoute: ConfiguracoesRoute,
+  CorRoute: CorRoute,
   EntrarCodigoRoute: EntrarCodigoRoute,
   JogadoresRoute: JogadoresRoute,
   MultijogadorRoute: MultijogadorRoute,
