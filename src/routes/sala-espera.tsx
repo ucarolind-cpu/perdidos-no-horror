@@ -11,6 +11,7 @@ import { LobbyPlayers } from "@/game/LobbyPlayers";
 import { RoomLiveSync } from "@/game/RoomLiveSync";
 import { GameShell } from "@/game/GameShell";
 import { playClick, playScreenMusic } from "@/game/audio";
+import { preloadAudio } from "@/game/preload";
 import lobbyMusic from "@/assets/sala-espera-musica.mp3.asset.json";
 import { vibrate } from "@/game/settings";
 import { useRoomActions, useRoomState } from "@/game/rooms";
@@ -39,7 +40,10 @@ function SalaEspera() {
   const { restore, leave, retry } = useRoomActions();
   const navigate = useNavigate();
   useEffect(() => { restore(); }, []);
-  useEffect(() => playScreenMusic(lobbyMusic.url), []);
+  useEffect(() => {
+    preloadAudio("/audio/lobby-player-join.mp3");
+    return playScreenMusic(lobbyMusic.url);
+  }, []);
 
   return (
     <GameShell>
