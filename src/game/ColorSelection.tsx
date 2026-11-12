@@ -144,7 +144,7 @@ export function ColorSelection() {
   };
 
   const confirm = async () => {
-    if (confirmed || submitting || !ready) return;
+    if (confirmed || submitting || !ready || requestInFlight.current) return;
     const taken = players.some(
       (player) => player.color_confirmed && player.player_color === selected && player.player_id !== ownPlayerId,
     );
@@ -153,6 +153,7 @@ export function ColorSelection() {
     playClick();
     vibrate(25);
     setSubmitting(true);
+    requestInFlight.current = true;
     setErrorMessage("");
     try {
       const { result, playerId } = await callRoomColorAction("confirm", selected);
@@ -167,6 +168,7 @@ export function ColorSelection() {
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Não foi possível confirmar sua cor.");
     } finally {
+      requestInFlight.current = false;
       setSubmitting(false);
     }
   };
@@ -199,7 +201,7 @@ export function ColorSelection() {
               aria-disabled={disabled}
               disabled={disabled}
               className={`color-option ${color.className}${selected === color.id ? " is-selected" : ""}`}
-              style={taken ? { opacity: 0.35, filter: "grayscale(1)", cursor: "not-allowed" } : undefined}
+              style={taken ? { opacity: 0.78, background: "rgba(95, 95, 95, 0.78)", cursor: "not-allowed" } : undefined}
               onClick={() => choose(color.id)}
             />
           );
