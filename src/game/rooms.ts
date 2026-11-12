@@ -129,8 +129,27 @@ export function useRoomActions() {
     if (!activeId || exiting) return true;
     const { saved } = await member({ data: { device: await identify(), action: "heartbeat", roomId: activeId } });
     if (!saved) return false;
+    // Detect only genuinely new guest IDs against an already-established room snapshot.
+    // The joining device already has itself in its join response, so it never emits a join sound.
+    const previous = state.saved;
+    const joinedPlayers = previous?.room.id === saved.room.id
+      ? saved.players.filter((player) =>
+          !player.is_host &&
+          player.player_id !== identity.id &&
+          !previous.players.some((known) => known.player_id === player.player_id),
+        )
+      : [];
     // Heartbeats do not rerender the scenery or even the list unless visible data changes.
     if (JSON.stringify(saved) !== JSON.stringify(state.saved)) publish({ saved, error: null });
+    if (joinedPlayers.length && typeof window !== "undefined") {
+      window.requestAnimationFrame(() => {
+        for (const player of joinedPlayers) {
+          window.dispatchEvent(new CustomEvent("pnh:room-player-joined", {
+            detail: { roomId: saved.room.id, playerId: player.player_id },
+          }));
+        }
+      });
+    }
     return true;
   };
   return { create, restore, leave, retry, join, refresh };
