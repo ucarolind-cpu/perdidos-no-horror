@@ -40,7 +40,7 @@ export function RoomLiveSync() {
     const channel = supabase.channel(`room:${topic}`, { config: { broadcast: { self: false } } })
       .on("broadcast", { event: "countdown-start" }, ({ payload }) => {
         if (typeof payload?.startsAt === "number") {
-          window.dispatchEvent(new CustomEvent("pnh:room-countdown-start", { detail: { startsAt: payload.startsAt } }));
+          window.dispatchEvent(new CustomEvent("pnh:room-countdown-started", { detail: { startsAt: payload.startsAt } }));
         }
       })
       .on("broadcast", { event: "changed" }, () => { void check(); })
