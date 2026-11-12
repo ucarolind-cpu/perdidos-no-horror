@@ -18,6 +18,8 @@ import { useRoomActions, useRoomState } from "@/game/rooms";
 import { RoomOwner } from "@/game/RoomOwner";
 import { LobbyCharacters } from "@/game/LobbyCharacters";
 import { FadeInFromBlack } from "@/game/DoorTransition";
+import colorBg from "@/assets/jogadores-bg.jpg.asset.json";
+import ownerSprite from "@/assets/room-owner.webp.asset.json";
 
 export const Route = createFileRoute("/sala-espera")({
   head: () => ({
@@ -65,6 +67,14 @@ function SalaEspera() {
     return playScreenMusic(lobbyMusic.url);
   }, []);
 
+  if (countdown === 0) {
+    return (
+      <GameShell>
+        <ColorSelection />
+      </GameShell>
+    );
+  }
+
   return (
     <GameShell>
       <div className="game-stage lobby">
@@ -81,6 +91,41 @@ function SalaEspera() {
         <FadeInFromBlack />
       </div>
     </GameShell>
+  );
+}
+
+
+const colorOptions = [
+  { id: "green", label: "Verde", value: "#42d65b", filter: "brightness(0) saturate(100%) invert(69%) sepia(57%) saturate(650%) hue-rotate(78deg) brightness(100%)" },
+  { id: "pink", label: "Rosa", value: "#ec65b4", filter: "brightness(0) saturate(100%) invert(54%) sepia(52%) saturate(1011%) hue-rotate(278deg) brightness(105%)" },
+  { id: "orange", label: "Laranja", value: "#ff8a24", filter: "brightness(0) saturate(100%) invert(62%) sepia(86%) saturate(1600%) hue-rotate(346deg) brightness(103%)" },
+  { id: "blue", label: "Azul", value: "#2587ed", filter: "brightness(0) saturate(100%) invert(43%) sepia(92%) saturate(1400%) hue-rotate(185deg) brightness(100%)" },
+  { id: "white", label: "Branco", value: "#f5f3ed", filter: "brightness(0) invert(1)" },
+] as const;
+
+function ColorSelection() {
+  const [selected, setSelected] = useState("white");
+  const chosen = colorOptions.find((option) => option.id === selected) ?? colorOptions[4];
+  return (
+    <div className="game-stage color-select-screen">
+      <img src={colorBg.url} alt="" className="game-bg" draggable={false} />
+      <h1 className="color-title wood-plank">SELEÇÃO DE COR</h1>
+      <div className="color-subtitle wood-plank">COR DO PERSONAGEM</div>
+      <img className="color-preview-character" src={ownerSprite.url} alt="Prévia do personagem"
+        style={{ filter: chosen.filter }} draggable={false} />
+      <div className="color-options">
+        {colorOptions.map((option) => (
+          <button key={option.id} type="button"
+            className={`color-option wood-plank${selected === option.id ? " is-selected" : ""}`}
+            onClick={() => { tap(); setSelected(option.id); }}
+            aria-pressed={selected === option.id}>
+            <span className="color-dot" style={{ backgroundColor: option.value }} />
+            <span>{option.label}</span>
+          </button>
+        ))}
+      </div>
+      <button type="button" className="color-confirm wood-plank" onClick={tap}>CONFIRMAR</button>
+    </div>
   );
 }
 
