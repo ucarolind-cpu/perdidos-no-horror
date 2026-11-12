@@ -18,11 +18,11 @@ export const Route = createFileRoute("/cor")({
 });
 
 const colors: { id: PlayerColor; label: string; sprite: number }[] = [
-  { id: "green", label: "Verde", sprite: 0 },
-  { id: "orange", label: "Laranja", sprite: 25 },
-  { id: "blue", label: "Azul", sprite: 50 },
-  { id: "white", label: "Branco", sprite: 75 },
-  { id: "pink", label: "Rosa", sprite: 100 },
+  { id: "green", label: "Verde", sprite: 25 },
+  { id: "orange", label: "Laranja", sprite: 75 },
+  { id: "blue", label: "Azul", sprite: 100 },
+  { id: "white", label: "Branco", sprite: 0 },
+  { id: "pink", label: "Rosa", sprite: 50 },
 ];
 
 const positions: Record<PlayerColor, string> = {
