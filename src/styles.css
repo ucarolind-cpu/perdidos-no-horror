@@ -473,9 +473,9 @@ input.wood-field { width: 100%; text-align: center; outline: none; border-color:
 }
 .color-player {
   position: absolute;
-  left: 42.75%;
+  left: 44%;
   top: 39.2%;
-  width: 14.5%;
+  width: 12%;
   height: 40.2%;
   background-image: url("/color-characters.png");
   background-repeat: no-repeat;
