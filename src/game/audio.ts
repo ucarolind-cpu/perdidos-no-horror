@@ -216,3 +216,16 @@ export function playScreenMusic(url: string): () => void {
     }
   };
 }
+
+
+/** Plays a single remote lobby effect through the configured SFX volume. */
+export function playOneShotSfx(url: string) {
+  if (typeof window === "undefined") return;
+  const element = acquireAudio(url);
+  const settings = getSettings();
+  element.loop = false;
+  element.preload = "auto";
+  element.volume = Math.max(0, Math.min(1, (settings.masterVolume / 100) * (settings.sfxVolume / 100)));
+  try { element.currentTime = 0; } catch { /* media metadata may still be loading */ }
+  void element.play().catch(() => {});
+}
