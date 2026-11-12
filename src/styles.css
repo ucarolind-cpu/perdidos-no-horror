@@ -459,7 +459,12 @@ input.wood-field { width: 100%; text-align: center; outline: none; border-color:
   outline: 2px solid #fff0c9;
   outline-offset: -0.6cqh;
 }
-.color-confirm:active { transform: scale(.985); }
+.color-confirm:active {
+  transform: scale(.985);
+  filter: brightness(1.35);
+  background: color-mix(in oklab, var(--game-ember) 16%, transparent);
+  box-shadow: 0 0 2.2cqh color-mix(in oklab, var(--game-ember) 55%, transparent);
+}
 
 
 
