@@ -120,7 +120,7 @@ export function useRoomActions() {
         creationInput = null;
         publish({ saved: result.saved, pending: false, error: null });
       } else publish({ pending: false, error: result.error });
-    }).catch(() => { message = "Não foi possível entrar. Tente novamente."; publish({ pending: false, error: message }); })
+    }).catch((error) => { message = error instanceof Error ? `Falha ao entrar na sala: ${error.message}` : "Falha desconhecida ao entrar na sala."; publish({ pending: false, error: message }); })
       .finally(() => { pending = null; });
     await pending;
     return message;
