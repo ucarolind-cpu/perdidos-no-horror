@@ -136,11 +136,14 @@ function SalaEspera() {
 function LobbyCode({ retry }: { retry: () => void }) {
   const { saved, error } = useRoomState();
   const [show, setShow] = useState(false);
-  return <div className="lobby-code-row">
-    <div className="wood-plank lobby-skin lobby-code" style={skin(skinCode.url)} title={error ?? undefined} aria-live="polite">CÓDIGO DA SALA: {error ? "ERRO" : show ? saved?.room.code ?? "••••" : "••••"}</div>
-    <button type="button" className="lobby-eye lobby-skin" style={skin(skinEye.url)} aria-label={show ? "OCULTAR CÓDIGO" : "MOSTRAR CÓDIGO"}
-      onClick={() => { tap(); if (error) retry(); else setShow((s) => !s); }}>{show ? <Eye /> : <EyeOff />}</button>
-  </div>;
+  return <>
+    <div className="lobby-code-row">
+      <div className="wood-plank lobby-skin lobby-code" style={skin(skinCode.url)} title={error ?? undefined} aria-live="polite">CÓDIGO DA SALA: {error ? "ERRO" : show ? saved?.room.code ?? "••••" : "••••"}</div>
+      <button type="button" className="lobby-eye lobby-skin" style={skin(skinEye.url)} aria-label={show ? "OCULTAR CÓDIGO" : "MOSTRAR CÓDIGO"}
+        onClick={() => { tap(); if (error) retry(); else setShow((s) => !s); }}>{show ? <Eye /> : <EyeOff />}</button>
+    </div>
+    {error && <div className="lobby-error-detail" role="alert">{error}</div>}
+  </>;
 }
 function HostStart({ started }: { started: boolean }) {
   const { saved } = useRoomState();
