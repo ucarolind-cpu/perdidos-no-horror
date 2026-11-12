@@ -7,7 +7,7 @@ type Phase = "fadeOut" | "scene" | "zoom" | "hold";
 
 const full: React.CSSProperties = { position: "absolute", inset: 0, zIndex: 50 };
 
-export function DoorTransition({ onDone }: { onDone: () => void }) {
+export function DoorTransition({ onDone, to = "/multijogador" }: { onDone: () => void; to?: "/multijogador" | "/cor" }) {
   const navigate = useNavigate();
   const [phase, setPhase] = useState<Phase>("fadeOut");
   const [blackOn, setBlackOn] = useState(false);
@@ -22,7 +22,7 @@ export function DoorTransition({ onDone }: { onDone: () => void }) {
       transition.fadeInNext = true;
       // Do not clear the transition component before navigation: doing so
       // reveals the previous screen for a frame while the next route mounts.
-      void navigate({ to: "/multijogador" }).then(onDone);
+      void navigate({ to }).then(onDone);
     };
     const raf = requestAnimationFrame(() => setBlackOn(true)); // fade to black 0.5s
     at(520, () => { setPhase("scene"); setBlackOn(false); }); // fade in door scene 0.5s
