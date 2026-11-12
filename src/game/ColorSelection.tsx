@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { DoorTransition, FadeInFromBlack } from "@/game/DoorTransition";
+import { FadeInFromBlack } from "@/game/DoorTransition";
 import { playClick } from "@/game/audio";
 import { vibrate } from "@/game/settings";
 import { getPlayerColor, setPlayerColor, type PlayerColor } from "@/game/session";
@@ -23,14 +23,13 @@ const colorButtons: { id: PlayerColor; className: string; label: string }[] = [
 
 export function ColorSelection() {
   const [selected, setSelected] = useState<PlayerColor>(() => getPlayerColor());
-  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     for (const image of Object.values(colorImages)) void preloadImage(image);
   }, []);
 
   const choose = (color: PlayerColor) => {
-    if (busy || selected === color) return;
+    if (selected === color) return;
     playClick();
     vibrate(20);
     setSelected(color);
@@ -38,11 +37,8 @@ export function ColorSelection() {
   };
 
   const confirm = () => {
-    if (busy) return;
     playClick();
     vibrate(25);
-    setPlayerColor(selected);
-    setBusy(true);
   };
 
   return (
@@ -63,7 +59,6 @@ export function ColorSelection() {
             aria-pressed={selected === color.id}
             className={`color-option ${color.className}`}
             onClick={() => choose(color.id)}
-            disabled={busy}
           />
         ))}
       </div>
@@ -72,9 +67,7 @@ export function ColorSelection() {
         aria-label="Confirmar cor"
         className="color-confirm"
         onClick={confirm}
-        disabled={busy}
       />
-      {busy && <DoorTransition onDone={() => setBusy(false)} />}
       <FadeInFromBlack />
     </div>
   );
