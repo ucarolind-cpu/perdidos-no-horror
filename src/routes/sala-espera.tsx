@@ -18,8 +18,6 @@ import { useRoomActions, useRoomState } from "@/game/rooms";
 import { RoomOwner } from "@/game/RoomOwner";
 import { LobbyCharacters } from "@/game/LobbyCharacters";
 import { FadeInFromBlack } from "@/game/DoorTransition";
-import colorBg from "@/assets/jogadores-bg.jpg.asset.json";
-import ownerSprite from "@/assets/room-owner.webp.asset.json";
 
 export const Route = createFileRoute("/sala-espera")({
   head: () => ({
@@ -96,35 +94,39 @@ function SalaEspera() {
 
 
 const colorOptions = [
-  { id: "green", label: "Verde", value: "#42d65b", filter: "brightness(0) saturate(100%) invert(69%) sepia(57%) saturate(650%) hue-rotate(78deg) brightness(100%)" },
-  { id: "pink", label: "Rosa", value: "#ec65b4", filter: "brightness(0) saturate(100%) invert(54%) sepia(52%) saturate(1011%) hue-rotate(278deg) brightness(105%)" },
-  { id: "orange", label: "Laranja", value: "#ff8a24", filter: "brightness(0) saturate(100%) invert(62%) sepia(86%) saturate(1600%) hue-rotate(346deg) brightness(103%)" },
-  { id: "blue", label: "Azul", value: "#2587ed", filter: "brightness(0) saturate(100%) invert(43%) sepia(92%) saturate(1400%) hue-rotate(185deg) brightness(100%)" },
-  { id: "white", label: "Branco", value: "#f5f3ed", filter: "brightness(0) invert(1)" },
+  { id: "white", label: "Branco", position: "0%", left: "77.5%", top: "44.5%", width: "18.8%", height: "10.8%" },
+  { id: "green", label: "Verde", position: "25%", left: "3.7%", top: "40.1%", width: "19.2%", height: "10.5%" },
+  { id: "pink", label: "Rosa", position: "50%", left: "3.7%", top: "52.4%", width: "19.2%", height: "10.5%" },
+  { id: "orange", label: "Laranja", position: "75%", left: "23.7%", top: "44.5%", width: "18.2%", height: "10.8%" },
+  { id: "blue", label: "Azul", position: "100%", left: "58.5%", top: "44.5%", width: "18.2%", height: "10.8%" },
 ] as const;
 
 function ColorSelection() {
   const [selected, setSelected] = useState("white");
-  const chosen = colorOptions.find((option) => option.id === selected) ?? colorOptions[4];
+  const chosen = colorOptions.find((option) => option.id === selected) ?? colorOptions[0];
   return (
     <div className="game-stage color-select-screen">
-      <img src={colorBg.url} alt="" className="game-bg" draggable={false} />
-      <h1 className="color-title wood-plank">SELEÇÃO DE COR</h1>
-      <div className="color-subtitle wood-plank">COR DO PERSONAGEM</div>
-      <img className="color-preview-character" src={ownerSprite.url} alt="Prévia do personagem"
-        style={{ filter: chosen.filter }} draggable={false} />
+      <img src="/color-select-bg.webp" alt="" className="game-bg" draggable={false} />
+      <div
+        className="color-character-preview"
+        style={{ backgroundPosition: `${chosen.position} center` }}
+        role="img"
+        aria-label={`Personagem na cor ${chosen.label}`}
+      />
       <div className="color-options">
         {colorOptions.map((option) => (
-          <button key={option.id} type="button"
-            className={`color-option wood-plank${selected === option.id ? " is-selected" : ""}`}
+          <button
+            key={option.id}
+            type="button"
+            className={`color-option${selected === option.id ? " is-selected" : ""}`}
+            style={{ left: option.left, top: option.top, width: option.width, height: option.height }}
             onClick={() => { tap(); setSelected(option.id); }}
-            aria-pressed={selected === option.id}>
-            <span className="color-dot" style={{ backgroundColor: option.value }} />
-            <span>{option.label}</span>
-          </button>
+            aria-label={option.label}
+            aria-pressed={selected === option.id}
+          />
         ))}
       </div>
-      <button type="button" className="color-confirm wood-plank" onClick={tap}>CONFIRMAR</button>
+      <button type="button" className="color-confirm" onClick={tap} aria-label="Confirmar cor" />
     </div>
   );
 }
