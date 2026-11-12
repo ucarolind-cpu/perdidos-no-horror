@@ -113,7 +113,7 @@ export function useRoomActions() {
     publish({ pending: true, error: null });
     let message: string | null = null;
     pending = identify().then(async (identity) => {
-      const result = await member({ data: { device: identity, action: "join", code, name: getSettings().playerName, gameMode: session.playerCount } });
+      const result = await member({ data: { device: identity, action: "join", code, name: getSettings().playerName } });
       message = result.error;
       if (result.saved) {
         loaded = true; activeId = result.saved.room.id; storage.write(ROOM_KEY, activeId);
