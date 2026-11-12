@@ -41,7 +41,7 @@ function SalaEspera() {
   const navigate = useNavigate();
   useEffect(() => { restore(); }, []);
   useEffect(() => {
-    preloadAudio("/audio/lobby-player-join.mp3");
+    preloadAudio("/378558__cawawac__asoada-impact-low-tube.wav");
     return playScreenMusic(lobbyMusic.url);
   }, []);
 
