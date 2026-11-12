@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff } from "lucide-react";
 import bg from "@/assets/espera-bg.jpg.asset.json";
@@ -40,26 +40,61 @@ const tap = () => { playClick(); vibrate(20); };
 function SalaEspera() {
   const { restore, leave, retry } = useRoomActions();
   const [countdown, setCountdown] = useState<number | null>(null);
+  const [showColorSelection, setShowColorSelection] = useState(false);
+  const [flashBlack, setFlashBlack] = useState(false);
+  const countdownTimer = useRef<number | null>(null);
+  const impactAudio = useRef<HTMLAudioElement | null>(null);
   useEffect(() => {
     const onStart = (event: Event) => {
       const startsAt = (event as CustomEvent<{ startsAt: number }>).detail?.startsAt;
       if (typeof startsAt !== "number") return;
-      let timer: number | null = null;
+      if (countdownTimer.current !== null) window.clearInterval(countdownTimer.current);
       const update = () => {
         const next = Math.max(0, Math.ceil((startsAt + 10000 - Date.now()) / 1000));
         setCountdown(next);
-        if (next === 0 && timer !== null) window.clearInterval(timer);
+        if (next === 0 && countdownTimer.current !== null) {
+          window.clearInterval(countdownTimer.current);
+          countdownTimer.current = null;
+        }
       };
       update();
-      if (Date.now() < startsAt + 10000) timer = window.setInterval(update, 100);
+      if (Date.now() < startsAt + 10000) countdownTimer.current = window.setInterval(update, 100);
     };
     window.addEventListener("pnh:room-countdown-start", onStart);
     window.addEventListener("pnh:room-countdown-started", onStart);
     return () => {
       window.removeEventListener("pnh:room-countdown-start", onStart);
       window.removeEventListener("pnh:room-countdown-started", onStart);
+      if (countdownTimer.current !== null) window.clearInterval(countdownTimer.current);
+      countdownTimer.current = null;
     };
   }, []);
+  useEffect(() => {
+    if (countdown !== 0 || showColorSelection) return;
+    const root = document.querySelector(".game-root");
+    root?.classList.add("screen-shake");
+    setFlashBlack(true);
+    const audio = new Audio("/audio/boom_3_muffled.mp3");
+    audio.volume = 1;
+    audio.loop = false;
+    impactAudio.current = audio;
+    void audio.play().catch(() => {});
+    const revealTimer = window.setTimeout(() => {
+      setFlashBlack(false);
+      setShowColorSelection(true);
+      root?.classList.remove("screen-shake");
+    }, 200);
+    const shakeTimer = window.setTimeout(() => root?.classList.remove("screen-shake"), 500);
+    return () => {
+      window.clearTimeout(revealTimer);
+      window.clearTimeout(shakeTimer);
+      root?.classList.remove("screen-shake");
+      audio.pause();
+      audio.currentTime = 0;
+      impactAudio.current = null;
+    };
+  }, [countdown, showColorSelection]);
+
   const navigate = useNavigate();
   useEffect(() => { restore(); }, []);
   useEffect(() => {
@@ -67,7 +102,7 @@ function SalaEspera() {
     return playScreenMusic(lobbyMusic.url);
   }, []);
 
-  if (countdown === 0) {
+  if (showColorSelection) {
     return (
       <GameShell>
         <ColorSelection />
@@ -77,7 +112,7 @@ function SalaEspera() {
 
   return (
     <GameShell>
-      <div className="game-stage lobby">
+      <div className={`game-stage lobby${flashBlack ? " countdown-blackout" : ""}`}>
         <img src={bg.url} alt="" className="game-bg" draggable={false} />
         <RoomOwner />
         <LobbyCharacters />
