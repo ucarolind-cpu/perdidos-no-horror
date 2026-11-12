@@ -18,6 +18,7 @@ import { useRoomActions, useRoomState } from "@/game/rooms";
 import { RoomOwner } from "@/game/RoomOwner";
 import { LobbyCharacters } from "@/game/LobbyCharacters";
 import { FadeInFromBlack } from "@/game/DoorTransition";
+import { ColorSelection } from "@/game/ColorSelection";
 
 export const Route = createFileRoute("/sala-espera")({
   head: () => ({
@@ -94,44 +95,6 @@ function SalaEspera() {
 }
 
 
-const colorOptions = [
-  { id: "white", label: "Branco", position: "0%", left: "77.5%", top: "44.5%", width: "18.8%", height: "10.8%" },
-  { id: "green", label: "Verde", position: "25%", left: "3.7%", top: "40.1%", width: "19.2%", height: "10.5%" },
-  { id: "pink", label: "Rosa", position: "50%", left: "3.7%", top: "52.4%", width: "19.2%", height: "10.5%" },
-  { id: "orange", label: "Laranja", position: "75%", left: "23.7%", top: "44.5%", width: "18.2%", height: "10.8%" },
-  { id: "blue", label: "Azul", position: "100%", left: "58.5%", top: "44.5%", width: "18.2%", height: "10.8%" },
-] as const;
-
-function ColorSelection() {
-  const [selected, setSelected] = useState("white");
-  const chosen = colorOptions.find((option) => option.id === selected) ?? colorOptions[0];
-  return (
-    <div className="game-stage color-select-screen">
-      <img src="/color-select-bg.webp" alt="" className="game-bg" draggable={false} />
-      <img src="/color-blue-button.webp" alt="" className="color-blue-button-cleanup" draggable={false} />
-      <div
-        className="color-character-preview"
-        style={{ backgroundPosition: `${chosen.position} center` }}
-        role="img"
-        aria-label={`Personagem na cor ${chosen.label}`}
-      />
-      <div className="color-options">
-        {colorOptions.map((option) => (
-          <button
-            key={option.id}
-            type="button"
-            className={`color-option${selected === option.id ? " is-selected" : ""}`}
-            style={{ left: option.left, top: option.top, width: option.width, height: option.height }}
-            onClick={() => { tap(); setSelected(option.id); }}
-            aria-label={option.label}
-            aria-pressed={selected === option.id}
-          />
-        ))}
-      </div>
-      <button type="button" className="color-confirm" onClick={tap} aria-label="Confirmar cor" />
-    </div>
-  );
-}
 
 function LobbyCode({ retry }: { retry: () => void }) {
   const { saved, error } = useRoomState();
