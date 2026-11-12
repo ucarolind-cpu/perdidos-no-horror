@@ -394,53 +394,68 @@ input.wood-field { width: 100%; text-align: center; outline: none; border-color:
 .lobby-btn:disabled { opacity: .55; cursor: default; }
 
 
-/* Seleção individual de cor após a contagem regressiva */
+/* Seleção de cor — arte de referência com botões de madeira e sprites originais. */
 .color-select-screen { font-family: var(--font-game); color: var(--game-parchment); }
-.color-title, .color-subtitle, .color-option, .color-confirm {
-  background: linear-gradient(180deg, oklch(0.43 0.055 58), oklch(0.27 0.04 48));
-  border: 2px solid oklch(0.16 0.025 48);
-  box-shadow: inset 0 0 0 2px oklch(0.62 0.12 72 / .18), 0 0.7cqh 1.5cqh #000b;
-  color: #e8d6b9;
-  text-shadow: 0 2px 3px #000;
-}
-.color-title {
-  left: 34.5%; top: 3.5%; width: 31%; height: 11%;
-  font-size: 5.4cqh; font-weight: 800;
-}
-.color-subtitle {
-  left: 40%; top: 17.5%; width: 20%; height: 7%;
-  font-size: 3.2cqh; font-weight: 700;
-}
-.color-preview-character {
-  position: absolute; z-index: 2; left: 45.3%; top: 39%;
-  width: 9.4%; height: 39%; object-fit: contain;
-  filter: drop-shadow(0 0.5cqh 0.8cqh #000b);
+.color-character-preview {
+  position: absolute;
+  z-index: 2;
+  left: 45%;
+  top: 39.5%;
+  width: 10%;
+  height: 41%;
+  background-image: url("/color-characters.webp");
+  background-repeat: no-repeat;
+  background-size: 500% 100%;
+  filter: drop-shadow(0 0.45cqh 0.7cqh #000b);
   pointer-events: none;
 }
-.color-options { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
-.color-option {
-  position: absolute; height: 9.5%; width: 18.8%;
-  display: flex; align-items: center; justify-content: center; gap: 1.2cqh;
-  font: 700 4.2cqh var(--font-game); cursor: pointer;
-  pointer-events: auto; transition: filter .16s, transform .12s, box-shadow .16s;
+.color-options {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
 }
-.color-option:nth-child(1) { left: 4%; top: 40%; }
-.color-option:nth-child(2) { left: 4%; top: 53%; }
-.color-option:nth-child(3) { left: 24%; top: 44%; }
-.color-option:nth-child(4) { left: 59%; top: 44%; }
-.color-option:nth-child(5) { left: 78%; top: 44%; }
-.color-dot {
-  display: inline-block; flex: 0 0 auto; width: 5.2cqh; height: 5.2cqh;
-  border-radius: 50%; border: 2px solid #33251b;
-  box-shadow: inset 0 1px 2px #ffffff88, 0 1px 3px #000b;
+.color-option {
+  position: absolute;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 1cqh;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
 }
 .color-option.is-selected {
-  filter: drop-shadow(0 0 1.7cqh #ffdc91) brightness(1.16);
-  box-shadow: inset 0 0 0 2px #e6c28b, 0 0 2.1cqh #f7d38b, 0 0 4cqh #d99c52aa;
-  transform: scale(1.025);
+  outline: 2px solid #f5d49a;
+  outline-offset: -0.6cqh;
+  box-shadow:
+    inset 0 0 1.2cqh #ffe5b3,
+    0 0 1.5cqh 0.5cqh #f6d18d,
+    0 0 3.2cqh 0.8cqh #d69b55aa;
 }
-.color-option:active, .color-confirm:active { transform: scale(.97); }
+.color-option:focus-visible {
+  outline: 2px solid #fff0c9;
+  outline-offset: -0.6cqh;
+}
+.color-option:active { transform: scale(.985); }
 .color-confirm {
-  left: 34.5%; bottom: 3.5%; width: 31%; height: 11%;
-  font: 800 5cqh var(--font-game); cursor: pointer;
+  position: absolute;
+  z-index: 5;
+  left: 32.5%;
+  top: 85.3%;
+  width: 35%;
+  height: 11.5%;
+  padding: 0;
+  border: 0;
+  border-radius: 1cqh;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
+.color-confirm:focus-visible {
+  outline: 2px solid #fff0c9;
+  outline-offset: -0.6cqh;
+}
+.color-confirm:active { transform: scale(.985); }
