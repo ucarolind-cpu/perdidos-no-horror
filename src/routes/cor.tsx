@@ -63,14 +63,15 @@ function ColorSelection() {
 
   return (
     <GameShell>
-      <div className="game-stage color-stage">
+      <div className="game-stage color-select-screen">
         <img src="/color-select-bg.webp" alt="" className="game-bg color-bg" draggable={false} />
         <div
-          className="color-player"
+          className="color-character-preview"
           style={{ backgroundPositionX: `${spritePosition}%` }}
           aria-hidden="true"
         />
-        <div className="color-blue-board" aria-hidden="true">Azul</div>
+        <div className="color-blue-button-cleanup" aria-hidden="true" />
+        <div className="color-options">
         {colors.map((color) => (
           <button
             key={color.id}
@@ -88,6 +89,7 @@ function ColorSelection() {
           onClick={confirm}
           disabled={busy}
         />
+        </div>
         {busy && <DoorTransition onDone={end} />}
         <FadeInFromBlack />
       </div>
