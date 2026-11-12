@@ -71,7 +71,7 @@ export function useRoomActions() {
       session.owner = { id: identity.id, name: hostName };
       const saved = await action({ data: { device: identity, action: "create", roomId, hostName, maxPlayers } });
       publish({ saved, pending: false });
-    }).catch(() => publish({ pending: false, error: "Não foi possível criar a sala. Toque no olho para tentar novamente." }))
+    }).catch((error) => publish({ pending: false, error: error instanceof Error ? `Falha ao criar sala: ${error.message}` : "Falha desconhecida ao criar sala." }))
       .finally(() => { pending = null; });
   };
   const restore = () => {
