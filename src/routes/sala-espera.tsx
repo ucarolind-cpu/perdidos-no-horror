@@ -38,6 +38,22 @@ const tap = () => { playClick(); vibrate(20); };
 
 function SalaEspera() {
   const { restore, leave, retry } = useRoomActions();
+  const [countdown, setCountdown] = useState<number | null>(null);
+  useEffect(() => {
+    const onStart = (event: Event) => {
+      const startsAt = (event as CustomEvent<{ startsAt: number }>).detail?.startsAt;
+      if (typeof startsAt !== "number") return;
+      const update = () => {
+        const next = Math.max(0, Math.ceil((startsAt + 10000 - Date.now()) / 1000));
+        setCountdown(next);
+        if (next === 0) window.clearInterval(timer);
+      };
+      update();
+      const timer = window.setInterval(update, 100);
+    };
+    window.addEventListener("pnh:room-countdown-start", onStart);
+    return () => window.removeEventListener("pnh:room-countdown-start", onStart);
+  }, []);
   const navigate = useNavigate();
   useEffect(() => { restore(); }, []);
   useEffect(() => {
@@ -54,7 +70,8 @@ function SalaEspera() {
         <RoomLiveSync />
         <h1 className="wood-plank lobby-skin lobby-title" style={skin(skinTitle.url)}>SALA DE ESPERA</h1>
         <LobbyCode retry={retry} />
-        <HostStart />
+        <HostStart started={countdown !== null} />
+        {countdown !== null && <div className="lobby-countdown" aria-live="off">{countdown}</div>}
         <Link to="/multijogador" className="wood-plank lobby-skin lobby-btn" style={{ top: "53%", ...skin(skinBtn2.url) }} onClick={async (e) => { e.preventDefault(); tap(); if (await leave()) await navigate({ to: "/multijogador" }); }}>Sair da sala</Link>
         <LobbyPlayers />
         <FadeInFromBlack />
@@ -72,8 +89,13 @@ function LobbyCode({ retry }: { retry: () => void }) {
       onClick={() => { tap(); if (error) retry(); else setShow((s) => !s); }}>{show ? <Eye /> : <EyeOff />}</button>
   </div>;
 }
-function HostStart() {
+function HostStart({ started }: { started: boolean }) {
   const { saved } = useRoomState();
   if (saved?.isHost === false) return null;
-  return <button type="button" className="wood-plank lobby-skin lobby-btn" style={{ top: "40.5%", ...skin(skinBtn1.url) }} onClick={tap}>Iniciar jogo</button>;
+  return <button type="button" className="wood-plank lobby-skin lobby-btn" style={{ top: "40.5%", ...skin(skinBtn1.url) }} disabled={started}
+    onClick={() => {
+      if (started || !saved?.isHost) return;
+      tap();
+      window.dispatchEvent(new CustomEvent("pnh:room-countdown-start", { detail: { startsAt: Date.now() } }));
+    }}>Iniciar jogo</button>;
 }
