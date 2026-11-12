@@ -57,8 +57,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/cor': typeof CorRoute
-  '/cor': typeof CorRoute
-  '/cor': typeof CorRoute
   '/entrar-codigo': typeof EntrarCodigoRoute
   '/jogadores': typeof JogadoresRoute
   '/multijogador': typeof MultijogadorRoute
@@ -67,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
+  '/cor': typeof CorRoute
   '/entrar-codigo': typeof EntrarCodigoRoute
   '/jogadores': typeof JogadoresRoute
   '/multijogador': typeof MultijogadorRoute
@@ -76,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
+  '/cor': typeof CorRoute
   '/entrar-codigo': typeof EntrarCodigoRoute
   '/jogadores': typeof JogadoresRoute
   '/multijogador': typeof MultijogadorRoute
@@ -87,8 +87,6 @@ export interface FileRouteTypes {
     | '/'
     | '/configuracoes'
     | '/cor'
-    | '/cor'
-    | '/cor'
     | '/entrar-codigo'
     | '/jogadores'
     | '/multijogador'
@@ -97,6 +95,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/configuracoes'
+    | '/cor'
     | '/entrar-codigo'
     | '/jogadores'
     | '/multijogador'
@@ -105,6 +104,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/configuracoes'
+    | '/cor'
     | '/entrar-codigo'
     | '/jogadores'
     | '/multijogador'
