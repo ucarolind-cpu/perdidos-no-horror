@@ -44,6 +44,7 @@ function SalaEspera() {
   const [flashBlack, setFlashBlack] = useState(false);
   const countdownTimer = useRef<number | null>(null);
   const impactAudio = useRef<HTMLAudioElement | null>(null);
+  const impactStarted = useRef(false);
   useEffect(() => {
     const onStart = (event: Event) => {
       const startsAt = (event as CustomEvent<{ startsAt: number }>).detail?.startsAt;
@@ -70,7 +71,8 @@ function SalaEspera() {
     };
   }, []);
   useEffect(() => {
-    if (countdown !== 0 || showColorSelection) return;
+    if (countdown !== 0 || impactStarted.current) return;
+    impactStarted.current = true;
     const root = document.querySelector(".game-root");
     root?.classList.add("screen-shake");
     setFlashBlack(true);
@@ -93,7 +95,7 @@ function SalaEspera() {
       audio.currentTime = 0;
       impactAudio.current = null;
     };
-  }, [countdown, showColorSelection]);
+  }, [countdown]);
 
   const navigate = useNavigate();
   useEffect(() => { restore(); }, []);
