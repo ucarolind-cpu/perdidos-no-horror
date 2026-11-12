@@ -32,14 +32,25 @@ export function RoomLiveSync() {
       } catch { /* heartbeat retries transient network failures */ }
       finally { checking = false; if (again && active) { again = false; void check(); } }
     };
+    const onCountdownStart = (event: Event) => {
+      const startsAt = (event as CustomEvent<{ startsAt: number }>).detail?.startsAt;
+      if (typeof startsAt !== "number") return;
+      void channel.send({ type: "broadcast", event: "countdown-start", payload: { startsAt } });
+    };
     const channel = supabase.channel(`room:${topic}`, { config: { broadcast: { self: false } } })
+      .on("broadcast", { event: "countdown-start" }, ({ payload }) => {
+        if (typeof payload?.startsAt === "number") {
+          window.dispatchEvent(new CustomEvent("pnh:room-countdown-start", { detail: { startsAt: payload.startsAt } }));
+        }
+      })
       .on("broadcast", { event: "changed" }, () => { void check(); })
       .on("broadcast", { event: "closed" }, () => { void check(); })
       .subscribe((status) => { if (status === "SUBSCRIBED") void check(); });
+    window.addEventListener("pnh:room-countdown-start", onCountdownStart);
     const timer = window.setInterval(() => { void check(); }, 25000);
     const focus = () => { if (document.visibilityState === "visible") void check(); };
     document.addEventListener("visibilitychange", focus);
-    return () => { active = false; clearInterval(timer); document.removeEventListener("visibilitychange", focus); void supabase.removeChannel(channel); };
+    return () => { active = false; clearInterval(timer); window.removeEventListener("pnh:room-countdown-start", onCountdownStart); document.removeEventListener("visibilitychange", focus); void supabase.removeChannel(channel); };
   }, [topic]);
   return null;
 }
