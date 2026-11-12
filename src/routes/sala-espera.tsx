@@ -43,13 +43,14 @@ function SalaEspera() {
     const onStart = (event: Event) => {
       const startsAt = (event as CustomEvent<{ startsAt: number }>).detail?.startsAt;
       if (typeof startsAt !== "number") return;
+      let timer: number | null = null;
       const update = () => {
         const next = Math.max(0, Math.ceil((startsAt + 10000 - Date.now()) / 1000));
         setCountdown(next);
-        if (next === 0) window.clearInterval(timer);
+        if (next === 0 && timer !== null) window.clearInterval(timer);
       };
       update();
-      const timer = window.setInterval(update, 100);
+      if (Date.now() < startsAt + 10000) timer = window.setInterval(update, 100);
     };
     window.addEventListener("pnh:room-countdown-start", onStart);
     window.addEventListener("pnh:room-countdown-started", onStart);
