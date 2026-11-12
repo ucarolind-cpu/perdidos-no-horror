@@ -34,7 +34,12 @@ export const roomAction = createServerFn({ method: "POST" })
     });
     if (error) { console.error("[Rooms] device_room_action failed:", { code: error.code, message: error.message, details: error.details, hint: error.hint }); throw new Error(`${error.message}${error.code ? ` [${error.code}]` : ""}`); }
     if (data.action === "delete" || result === null) return null;
-    return { ...savedRoomSchema.parse(result), isHost: true };
+    // Older device_room_action responses may omit game_mode; the room creation
+    // RPC stores max_players as the authoritative equivalent for host-created rooms.
+    const normalizedResult = result && typeof result === "object" && "room" in result
+      ? { ...result, room: { ...result.room, game_mode: result.room.game_mode ?? result.room.max_players } }
+      : result;
+    return { ...savedRoomSchema.parse(normalizedResult), isHost: true };
   });
 
 export const memberRoomAction = createServerFn({ method: "POST" })
