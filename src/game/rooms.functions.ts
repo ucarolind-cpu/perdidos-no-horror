@@ -84,23 +84,26 @@ export const memberRoomAction = createServerFn({ method: "POST" })
     }
   });
 
-// Color selection uses the same server-side Supabase connection as room creation/join.
-// This avoids sending the device capability to a different project from the browser client.
+// Color selection calls a dedicated single-JSON RPC. This avoids PostgREST
+// argument-name resolution issues from the older five-parameter RPC signature.
 export const roomColorAction = createServerFn({ method: "POST" })
   .inputValidator((input) => roomColorActionSchema.parse(input))
   .handler(async ({ data }) => {
     const secretHash = await hashSecret(data.device.secret);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: result, error } = await (supabaseAdmin as any).rpc("room_color_action", {
+    const request = {
       p_device_id: data.device.id,
       p_secret_hash: secretHash,
       p_room_id: data.roomId,
       p_action: data.action,
-      p_color: data.color ?? null,
+      ...(data.color ? { p_color: data.color } : {}),
+    };
+    const { data: result, error } = await (supabaseAdmin as any).rpc("room_color_selection", {
+      p_request: request,
     });
 
     if (error) {
-      console.error("[Rooms] room_color_action failed:", {
+      console.error("[Rooms] room_color_selection failed:", {
         code: error.code, message: error.message, details: error.details, hint: error.hint,
       });
       throw new Error(`Erro Supabase ${error.code ?? ""}: ${error.message}`.trim());
