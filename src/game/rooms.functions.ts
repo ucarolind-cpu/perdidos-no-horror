@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { memberActionSchema, roomActionSchema, roomColorActionSchema, savedRoomSchema } from "./room-contract";
+import { deviceSchema, memberActionSchema, roomActionSchema, roomColorActionSchema, savedRoomSchema } from "./room-contract";
 
 async function hashSecret(secret: string) {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(secret));
@@ -15,6 +15,20 @@ export const registerPlayerDevice = createServerFn({ method: "POST" }).handler(a
   if (error || !data) { console.error("[Rooms] device registration failed:", error); throw new Error(error?.message ?? "Registro do aparelho não retornou dados."); }
   return { id: data.id, secret };
 });
+
+export const validatePlayerDevice = createServerFn({ method: "POST" })
+  .inputValidator((input) => deviceSchema.parse(input))
+  .handler(async ({ data }) => {
+    const secretHash = await hashSecret(data.secret);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: registered, error } = await supabaseAdmin.from("player_devices")
+      .select("id").eq("id", data.id).eq("secret_hash", secretHash).maybeSingle();
+    if (error) {
+      console.error("[Rooms] device validation failed:", error);
+      throw new Error(error.message);
+    }
+    return Boolean(registered);
+  });
 
 export const roomAction = createServerFn({ method: "POST" })
   .inputValidator((input) => roomActionSchema.parse(input))
