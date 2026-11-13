@@ -26,4 +26,15 @@ export const savedRoomSchema = z.object({
   players: z.array(z.object({ room_id: z.string().uuid(), player_id: z.string().uuid(), player_name: z.string(), is_host: z.boolean(), joined_at: z.string() })),
   isHost: z.boolean().optional(),
 });
+
+export const roomColorActionSchema = z.object({
+  device: deviceSchema,
+  roomId: z.string().uuid(),
+  action: z.enum(["get", "confirm"]),
+  color: z.enum(["green", "pink", "orange", "blue", "white"]).optional(),
+}).superRefine((data, ctx) => {
+  if (data.action === "confirm" && data.color === undefined) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Selecione uma cor antes de confirmar." });
+  }
+});
 export type SavedRoom = z.infer<typeof savedRoomSchema>;
