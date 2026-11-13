@@ -1,3 +1,4 @@
+// Lovable refresh marker: rebuild color-selection bundle.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FadeInFromBlack } from "@/game/DoorTransition";
 import { playClick } from "@/game/audio";
