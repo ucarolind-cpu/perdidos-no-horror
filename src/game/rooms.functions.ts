@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { memberActionSchema, roomActionSchema, savedRoomSchema } from "./room-contract";
+import { memberActionSchema, roomActionSchema, roomColorActionSchema, savedRoomSchema } from "./room-contract";
 
 async function hashSecret(secret: string) {
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(secret));
@@ -68,4 +68,34 @@ export const memberRoomAction = createServerFn({ method: "POST" })
       console.error("[Rooms] member room action failed:", error);
       return { saved: null, error: error instanceof Error ? `Falha ao processar entrada: ${error.message}` : "Falha desconhecida ao processar entrada." };
     }
+  });
+
+// Color selection uses the same server-side Supabase connection as room creation/join.
+// This avoids sending the device capability to a different project from the browser client.
+export const roomColorAction = createServerFn({ method: "POST" })
+  .inputValidator((input) => roomColorActionSchema.parse(input))
+  .handler(async ({ data }) => {
+    const secretHash = await hashSecret(data.device.secret);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: result, error } = await (supabaseAdmin as any).rpc("room_color_action", {
+      p_device_id: data.device.id,
+      p_secret_hash: secretHash,
+      p_room_id: data.roomId,
+      p_action: data.action,
+      p_color: data.color ?? null,
+    });
+
+    if (error) {
+      console.error("[Rooms] room_color_action failed:", {
+        code: error.code, message: error.message, details: error.details, hint: error.hint,
+      });
+      throw new Error(`Erro Supabase ${error.code ?? ""}: ${error.message}`.trim());
+    }
+
+    if (result && typeof result === "object" && "error" in result) {
+      const serverError = (result as { error?: unknown }).error;
+      if (typeof serverError === "string") throw new Error(serverError);
+    }
+
+    return result;
   });
