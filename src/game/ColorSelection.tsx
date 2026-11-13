@@ -60,9 +60,11 @@ export function ColorSelection() {
     });
     return { result: data as RoomColorResult, playerId: device.id };
   }, [invokeRoomColorAction]);
+
   const [selected, setSelected] = useState<PlayerColor>(() => getPlayerColor());
   const [players, setPlayers] = useState<RoomColorPlayer[]>([]);
   const [ownPlayerId, setOwnPlayerId] = useState<string | null>(null);
+  const [confirmed, setConfirmed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [ready, setReady] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -87,17 +89,17 @@ export function ColorSelection() {
         setReady(true);
         setErrorMessage("");
 
-        // Use the server's saved color only for the initial load. Later polling
-        // must not overwrite a new color the player is currently choosing.
+        // Only a confirmation returned by the server may lock this screen.
         if (!initialColorLoaded.current) {
           initialColorLoaded.current = true;
           if (result.color_confirmed && result.player_color) {
             setSelected(result.player_color);
             setPlayerColor(result.player_color);
+            setConfirmed(true);
             const label = colorButtons.find((option) => option.id === result.player_color)?.label;
             setFeedback(`Cor ${label ?? "selecionada"} selecionada!`);
           }
-        } else {
+        } else if (!confirmed) {
           const selectedIsTaken = (result.players ?? []).some(
             (player) => player.color_confirmed && player.player_color === selected && player.player_id !== playerId,
           );
@@ -123,9 +125,10 @@ export function ColorSelection() {
       active = false;
       window.clearInterval(timer);
     };
-  }, [selected, callRoomColorAction]);
+  }, [selected, confirmed, callRoomColorAction]);
 
   const choose = (color: PlayerColor) => {
+    if (confirmed || submitting) return;
     const taken = players.some(
       (player) => player.color_confirmed && player.player_color === color && player.player_id !== ownPlayerId,
     );
@@ -138,7 +141,7 @@ export function ColorSelection() {
   };
 
   const confirm = async () => {
-    if (submitting || !ready || requestInFlight.current) return;
+    if (confirmed || submitting || !ready || requestInFlight.current) return;
     const colorToConfirm = selected;
     const taken = players.some(
       (player) => player.color_confirmed && player.player_color === colorToConfirm && player.player_id !== ownPlayerId,
@@ -158,6 +161,7 @@ export function ColorSelection() {
         throw new Error("O Supabase não confirmou a cor selecionada.");
       }
       setPlayerColor(colorToConfirm);
+      setConfirmed(true);
       const label = colorButtons.find((option) => option.id === colorToConfirm)?.label;
       setFeedback(`Cor ${label ?? "selecionada"} selecionada!`);
     } catch (error) {
@@ -186,7 +190,9 @@ export function ColorSelection() {
           const taken = players.some(
             (player) => player.color_confirmed && player.player_color === color.id && player.player_id !== ownPlayerId,
           );
-          const disabled = taken || !ready;
+          // Before confirmation, color choices stay clickable even while the first
+          // room check is loading. Confirmation itself waits for the server check.
+          const disabled = confirmed || submitting || taken;
           return (
             <button
               key={color.id}
@@ -205,10 +211,10 @@ export function ColorSelection() {
       <button
         type="button"
         aria-label="Confirmar cor"
-        className="color-confirm"
+        className={`color-confirm${confirmed ? " is-activated" : ""}`}
         onClick={confirm}
-        disabled={!ready || submitting || selectedTaken}
-        style={!ready || submitting || selectedTaken ? { opacity: 0.45, cursor: "not-allowed" } : undefined}
+        disabled={!ready || submitting || confirmed || selectedTaken}
+        style={!ready || submitting || confirmed || selectedTaken ? { opacity: 0.45, cursor: "not-allowed" } : undefined}
       />
       {feedback && (
         <div role="status" style={{
