@@ -63,12 +63,12 @@ export function ColorSelection() {
   const [selected, setSelected] = useState<PlayerColor>(() => getPlayerColor());
   const [players, setPlayers] = useState<RoomColorPlayer[]>([]);
   const [ownPlayerId, setOwnPlayerId] = useState<string | null>(null);
-  const [confirmed, setConfirmed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [ready, setReady] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const requestInFlight = useRef(false);
+  const initialColorLoaded = useRef(false);
 
   useEffect(() => {
     for (const image of Object.values(colorImages)) void preloadImage(image);
@@ -86,13 +86,18 @@ export function ColorSelection() {
         setPlayers(result.players ?? []);
         setReady(true);
         setErrorMessage("");
-        if (result.color_confirmed && result.player_color) {
-          setSelected(result.player_color);
-          setConfirmed(true);
-          setFeedback("Cor Confirmada!");
-          setPlayerColor(result.player_color);
+
+        // Use the server's saved color only for the initial load. Later polling
+        // must not overwrite a new color the player is currently choosing.
+        if (!initialColorLoaded.current) {
+          initialColorLoaded.current = true;
+          if (result.color_confirmed && result.player_color) {
+            setSelected(result.player_color);
+            setPlayerColor(result.player_color);
+            const label = colorButtons.find((option) => option.id === result.player_color)?.label;
+            setFeedback(`Cor ${label ?? "selecionada"} selecionada!`);
+          }
         } else {
-          setConfirmed(false);
           const selectedIsTaken = (result.players ?? []).some(
             (player) => player.color_confirmed && player.player_color === selected && player.player_id !== playerId,
           );
@@ -121,12 +126,10 @@ export function ColorSelection() {
   }, [selected, callRoomColorAction]);
 
   const choose = (color: PlayerColor) => {
-    if (confirmed || submitting) return;
     const taken = players.some(
       (player) => player.color_confirmed && player.player_color === color && player.player_id !== ownPlayerId,
     );
-    if (taken) return;
-    if (selected === color) return;
+    if (taken || selected === color) return;
     playClick();
     vibrate(20);
     setSelected(color);
@@ -135,9 +138,10 @@ export function ColorSelection() {
   };
 
   const confirm = async () => {
-    if (confirmed || submitting || !ready || requestInFlight.current) return;
+    if (submitting || !ready || requestInFlight.current) return;
+    const colorToConfirm = selected;
     const taken = players.some(
-      (player) => player.color_confirmed && player.player_color === selected && player.player_id !== ownPlayerId,
+      (player) => player.color_confirmed && player.player_color === colorToConfirm && player.player_id !== ownPlayerId,
     );
     if (taken) return;
 
@@ -147,15 +151,15 @@ export function ColorSelection() {
     requestInFlight.current = true;
     setErrorMessage("");
     try {
-      const { result, playerId } = await callRoomColorAction("confirm", selected);
+      const { result, playerId } = await callRoomColorAction("confirm", colorToConfirm);
       setOwnPlayerId(playerId);
       setPlayers(result.players ?? []);
-      if (!result.color_confirmed || result.player_color !== selected) {
+      if (!result.color_confirmed || result.player_color !== colorToConfirm) {
         throw new Error("O Supabase não confirmou a cor selecionada.");
       }
-      setConfirmed(true);
-      setPlayerColor(selected);
-      setFeedback("Cor Confirmada!");
+      setPlayerColor(colorToConfirm);
+      const label = colorButtons.find((option) => option.id === colorToConfirm)?.label;
+      setFeedback(`Cor ${label ?? "selecionada"} selecionada!`);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Não foi possível confirmar sua cor.");
     } finally {
@@ -182,7 +186,7 @@ export function ColorSelection() {
           const taken = players.some(
             (player) => player.color_confirmed && player.player_color === color.id && player.player_id !== ownPlayerId,
           );
-          const disabled = confirmed || submitting || taken || !ready;
+          const disabled = taken || !ready;
           return (
             <button
               key={color.id}
@@ -201,10 +205,10 @@ export function ColorSelection() {
       <button
         type="button"
         aria-label="Confirmar cor"
-        className={`color-confirm${confirmed ? " is-activated" : ""}`}
+        className="color-confirm"
         onClick={confirm}
-        disabled={!ready || submitting || confirmed || selectedTaken}
-        style={!ready || submitting || confirmed || selectedTaken ? { opacity: 0.45, cursor: "not-allowed" } : undefined}
+        disabled={!ready || submitting || selectedTaken}
+        style={!ready || submitting || selectedTaken ? { opacity: 0.45, cursor: "not-allowed" } : undefined}
       />
       {feedback && (
         <div role="status" style={{
