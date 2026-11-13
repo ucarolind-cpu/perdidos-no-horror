@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { registerPlayerDevice, roomAction, memberRoomAction } from "./rooms.functions";
+import { registerPlayerDevice, roomAction, memberRoomAction, validatePlayerDevice } from "./rooms.functions";
 import { deviceSchema, type DeviceIdentity, type SavedRoom } from "./room-contract";
 import { getSettings } from "./settings";
 import { session, setRoomOwner } from "./session";
@@ -44,14 +44,27 @@ export function useRoomActions() {
   const register = useServerFn(registerPlayerDevice);
   const action = useServerFn(roomAction);
   const member = useServerFn(memberRoomAction);
+  const validateDevice = useServerFn(validatePlayerDevice);
   const identify = (): Promise<DeviceIdentity> => {
     if (device) return Promise.resolve(device);
     if (devicePending) return devicePending;
     const saved = storedDevice();
-    if (saved.success) { device = saved.data; return Promise.resolve(device); }
-    devicePending = register().then((value) => {
-      device = value; storage.write(DEVICE_KEY, JSON.stringify(value)); return value;
-    }).finally(() => { devicePending = null; });
+    devicePending = (async () => {
+      if (saved.success) {
+        const valid = await validateDevice({ data: saved.data });
+        if (valid) {
+          device = saved.data;
+          return device;
+        }
+        // A saved capability can belong to the previous Supabase project.
+        // Discard only the stale device identity; the caller owns room recovery.
+        storage.remove(DEVICE_KEY);
+      }
+      const value = await register();
+      device = value;
+      storage.write(DEVICE_KEY, JSON.stringify(value));
+      return value;
+    })().finally(() => { devicePending = null; });
     return devicePending;
   };
   const create = (retrying = false) => {
