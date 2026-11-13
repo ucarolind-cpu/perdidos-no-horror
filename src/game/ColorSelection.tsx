@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FadeInFromBlack } from "@/game/DoorTransition";
 import { playClick } from "@/game/audio";
 import { vibrate } from "@/game/settings";
 import { getPlayerColor, setPlayerColor, type PlayerColor } from "@/game/session";
 import { preloadImage } from "@/game/preload";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { roomColorAction } from "@/game/rooms.functions";
 
 const colorImages: Record<PlayerColor, string> = {
   white: "/1791172108155.jpg",
@@ -35,40 +36,30 @@ type RoomColorResult = {
   error?: string;
 };
 
-async function callRoomColorAction(action: "get" | "confirm", color?: PlayerColor) {
-  const roomId = localStorage.getItem("pnh-active-room-v1");
-  const rawDevice = localStorage.getItem("pnh-player-device-v1");
-  if (!roomId || !rawDevice) {
-    throw new Error("Entre em uma sala multiplayer antes de confirmar sua cor.");
-  }
-
-  let device: { id: string; secret: string };
-  try {
-    device = JSON.parse(rawDevice);
-  } catch {
-    throw new Error("Não foi possível identificar seu jogador. Entre novamente na sala.");
-  }
-  if (!device?.id || !device?.secret) {
-    throw new Error("Identificação do jogador inválida. Entre novamente na sala.");
-  }
-
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(device.secret));
-  const secretHash = Array.from(new Uint8Array(digest), (value) => value.toString(16).padStart(2, "0")).join("");
-  const { data, error } = await (supabase as any).rpc("room_color_action", {
-    p_device_id: device.id,
-    p_secret_hash: secretHash,
-    p_room_id: roomId,
-    p_action: action,
-    p_color: color ?? null,
-  });
-
-  if (error) throw new Error(error.message ?? "Falha ao comunicar com o Supabase.");
-  const result = data as RoomColorResult;
-  if (result?.error) throw new Error(result.error);
-  return { result, playerId: device.id };
-}
-
 export function ColorSelection() {
+  const invokeRoomColorAction = useServerFn(roomColorAction);
+  const callRoomColorAction = useCallback(async (action: "get" | "confirm", color?: PlayerColor) => {
+    const roomId = localStorage.getItem("pnh-active-room-v1");
+    const rawDevice = localStorage.getItem("pnh-player-device-v1");
+    if (!roomId || !rawDevice) {
+      throw new Error("Entre em uma sala multiplayer antes de confirmar sua cor.");
+    }
+
+    let device: { id: string; secret: string };
+    try {
+      device = JSON.parse(rawDevice);
+    } catch {
+      throw new Error("Não foi possível identificar seu jogador. Entre novamente na sala.");
+    }
+    if (!device?.id || !device?.secret) {
+      throw new Error("Identificação do jogador inválida. Entre novamente na sala.");
+    }
+
+    const data = await invokeRoomColorAction({
+      data: { device, roomId, action, ...(color ? { color } : {}) },
+    });
+    return { result: data as RoomColorResult, playerId: device.id };
+  }, [invokeRoomColorAction]);
   const [selected, setSelected] = useState<PlayerColor>(() => getPlayerColor());
   const [players, setPlayers] = useState<RoomColorPlayer[]>([]);
   const [ownPlayerId, setOwnPlayerId] = useState<string | null>(null);
@@ -127,7 +118,7 @@ export function ColorSelection() {
       active = false;
       window.clearInterval(timer);
     };
-  }, [selected]);
+  }, [selected, callRoomColorAction]);
 
   const choose = (color: PlayerColor) => {
     if (confirmed || submitting) return;
