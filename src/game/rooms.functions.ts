@@ -77,7 +77,17 @@ export const memberRoomAction = createServerFn({ method: "POST" })
         const serverError = result["error"];
         return { saved: null, error: typeof serverError === "string" ? serverError : "Sala não encontrada" };
       }
-      return { saved: savedRoomSchema.parse(result), error: null };
+      const normalizedResult = data.action === "join" &&
+        typeof result === "object" && !Array.isArray(result) && "room" in result
+        ? {
+            ...result,
+            room: {
+              ...result.room,
+              game_mode: Number(data.gameMode),
+            },
+          }
+        : result;
+      return { saved: savedRoomSchema.parse(normalizedResult), error: null };
     } catch (error) {
       console.error("[Rooms] member room action failed:", error);
       return { saved: null, error: error instanceof Error ? `Falha ao processar entrada: ${error.message}` : "Falha desconhecida ao processar entrada." };
