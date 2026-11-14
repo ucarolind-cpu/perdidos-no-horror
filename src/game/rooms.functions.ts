@@ -107,10 +107,14 @@ export const roomColorAction = createServerFn({ method: "POST" })
     if (data.action === "confirm") {
       if (!data.color) throw new Error("Selecione uma cor antes de confirmar.");
 
+      const playerId = registeredDevice.id;
+      const roomId = data.roomId;
+      const selectedColor = data.color;
+
       const { error: saveError } = await (supabaseAdmin as any).rpc("salvar_cor_jogador", {
-        p_device_id: registeredDevice.id,
-        p_room_id: data.roomId,
-        p_color: data.color,
+        p_device_id: playerId,
+        p_room_id: roomId,
+        p_color: selectedColor,
       });
 
       if (saveError) {
