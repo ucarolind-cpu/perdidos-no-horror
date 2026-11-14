@@ -107,7 +107,7 @@ function EntrarCodigo() {
         <Link to="/multijogador" aria-label="VOLTAR" className="menu-hotspot"
           style={pos(3.3, 87, 15.8, 9.4)} onClick={tap} />
         <FadeInFromBlack />
-        {message && <div className="room-message code-message" role="status">{message}</div>}
+        {message && <div className="room-message code-message" role="alert">{message}</div>}
         {entering && <RoomEntryTransition onDone={endEntry} />}
       </div>
     </GameShell>
