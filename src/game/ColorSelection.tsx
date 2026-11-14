@@ -97,8 +97,7 @@ export function ColorSelection() {
             setSelected(result.player_color);
             setPlayerColor(result.player_color);
             setConfirmed(true);
-            const label = colorButtons.find((option) => option.id === result.player_color)?.label;
-            setFeedback(`Cor ${label ?? "selecionada"} selecionada!`);
+            setFeedback("Aguardando jogadores...");
           }
         } else if (!confirmed) {
           const selectedIsTaken = (result.players ?? []).some(
@@ -163,8 +162,7 @@ export function ColorSelection() {
       }
       setPlayerColor(colorToConfirm);
       setConfirmed(true);
-      const label = colorButtons.find((option) => option.id === colorToConfirm)?.label;
-      setFeedback(`Cor ${label ?? "selecionada"} selecionada!`);
+      setFeedback("Aguardando jogadores...");
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Não foi possível confirmar sua cor.");
     } finally {
