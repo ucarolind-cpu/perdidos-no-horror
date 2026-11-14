@@ -124,7 +124,8 @@ export const roomColorAction = createServerFn({ method: "POST" })
       }
     }
 
-    const { data: players, error: playersError } = await supabaseAdmin
+    // These room color columns were added after the generated Database types.
+    const { data: players, error: playersError } = await (supabaseAdmin as any)
       .from("room_players")
       .select("player_id, player_color, color_confirmed")
       .eq("room_id", data.roomId);
