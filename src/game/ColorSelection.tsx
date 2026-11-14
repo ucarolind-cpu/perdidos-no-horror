@@ -156,11 +156,22 @@ export function ColorSelection() {
     setErrorMessage("");
     try {
       const { result, playerId } = await callRoomColorAction("confirm", colorToConfirm);
-      setOwnPlayerId(playerId);
-      setPlayers(result.players ?? []);
-      if (!result.color_confirmed || result.player_color !== colorToConfirm) {
+      const returnedPlayers = result.players ?? [];
+      const confirmedPlayer = returnedPlayers.find((player) => player.player_id === playerId);
+      if (
+        !result.color_confirmed ||
+        result.player_color !== colorToConfirm ||
+        !confirmedPlayer?.color_confirmed ||
+        confirmedPlayer.player_color !== colorToConfirm
+      ) {
         throw new Error("O Supabase não confirmou a cor selecionada.");
       }
+      setOwnPlayerId(playerId);
+      setPlayers(returnedPlayers.map((player) =>
+        player.player_id === playerId
+          ? { ...player, player_color: colorToConfirm, color_confirmed: true }
+          : player,
+      ));
       setPlayerColor(colorToConfirm);
       setConfirmed(true);
       setFeedback("Aguardando jogadores...");
