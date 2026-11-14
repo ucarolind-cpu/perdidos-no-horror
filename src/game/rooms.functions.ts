@@ -84,35 +84,70 @@ export const memberRoomAction = createServerFn({ method: "POST" })
     }
   });
 
-// Color selection calls a dedicated single-JSON RPC. This avoids PostgREST
-// argument-name resolution issues from the older five-parameter RPC signature.
+// Color actions remain server-side so the device secret is checked before
+// either reading room colors or invoking the restricted save RPC.
 export const roomColorAction = createServerFn({ method: "POST" })
   .inputValidator((input) => roomColorActionSchema.parse(input))
   .handler(async ({ data }) => {
     const secretHash = await hashSecret(data.device.secret);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const request = {
-      p_device_id: data.device.id,
-      p_secret_hash: secretHash,
-      p_room_id: data.roomId,
-      p_action: data.action,
-      ...(data.color ? { p_color: data.color } : {}),
-    };
-    const { data: result, error } = await (supabaseAdmin as any).rpc("room_color_selection", {
-      p_request: request,
-    });
 
-    if (error) {
-      console.error("[Rooms] room_color_selection failed:", {
-        code: error.code, message: error.message, details: error.details, hint: error.hint,
+    const { data: registeredDevice, error: deviceError } = await supabaseAdmin
+      .from("player_devices")
+      .select("id")
+      .eq("id", data.device.id)
+      .eq("secret_hash", secretHash)
+      .maybeSingle();
+
+    if (deviceError || !registeredDevice) {
+      console.error("[Rooms] color action device authentication failed:", deviceError);
+      throw new Error(deviceError?.message ?? "Aparelho não autenticado.");
+    }
+
+    if (data.action === "confirm") {
+      if (!data.color) throw new Error("Selecione uma cor antes de confirmar.");
+
+      const { error: saveError } = await (supabaseAdmin as any).rpc("salvar_cor_jogador", {
+        p_device_id: registeredDevice.id,
+        p_room_id: data.roomId,
+        p_color: data.color,
       });
-      throw new Error(`Erro Supabase ${error.code ?? ""}: ${error.message}`.trim());
+
+      if (saveError) {
+        console.error("[Rooms] salvar_cor_jogador failed:", {
+          code: saveError.code,
+          message: saveError.message,
+          details: saveError.details,
+          hint: saveError.hint,
+        });
+        throw new Error(`Erro Supabase ${saveError.code ?? ""}: ${saveError.message}`.trim());
+      }
     }
 
-    if (result && typeof result === "object" && "error" in result) {
-      const serverError = (result as { error?: unknown }).error;
-      if (typeof serverError === "string") throw new Error(serverError);
+    const { data: players, error: playersError } = await supabaseAdmin
+      .from("room_players")
+      .select("player_id, player_color, color_confirmed")
+      .eq("room_id", data.roomId);
+
+    if (playersError) {
+      console.error("[Rooms] room color list failed:", playersError);
+      throw new Error(`Erro Supabase ${playersError.code ?? ""}: ${playersError.message}`.trim());
     }
 
-    return result;
+    const roomPlayers = players ?? [];
+    const ownPlayer = roomPlayers.find((player) => player.player_id === registeredDevice.id);
+
+    if (!ownPlayer) {
+      throw new Error("Este jogador não pertence a esta sala.");
+    }
+
+    if (data.action === "confirm" && (!ownPlayer.color_confirmed || ownPlayer.player_color !== data.color)) {
+      throw new Error("O Supabase não confirmou a cor selecionada.");
+    }
+
+    return {
+      players: roomPlayers,
+      player_color: ownPlayer.player_color,
+      color_confirmed: ownPlayer.color_confirmed,
+    };
   });
