@@ -1,4 +1,4 @@
-// Lovable refresh marker: rebuild color-selection bundle.
+// Lovable deploy refresh marker: room color persistence RPC is wired in rooms.functions.ts.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FadeInFromBlack } from "@/game/DoorTransition";
 import { playClick } from "@/game/audio";
