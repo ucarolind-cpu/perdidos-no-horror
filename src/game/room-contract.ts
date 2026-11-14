@@ -23,7 +23,15 @@ export const memberActionSchema = z.object({
 });
 export const savedRoomSchema = z.object({
   room: z.object({ id: z.string().uuid(), code: z.string().regex(/^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{4}$/), host_player_id: z.string().uuid(), host_name: z.string(), max_players: z.number().int().min(2).max(5), game_mode: z.number().int().min(2).max(5), status: z.literal("aguardando"), created_at: z.string(), realtime_topic: z.string().optional() }),
-  players: z.array(z.object({ room_id: z.string().uuid(), player_id: z.string().uuid(), player_name: z.string(), is_host: z.boolean(), joined_at: z.string() })),
+  players: z.array(z.object({
+    room_id: z.string().uuid(),
+    player_id: z.string().uuid(),
+    player_name: z.string(),
+    is_host: z.boolean(),
+    joined_at: z.string(),
+    player_color: z.enum(["green", "pink", "orange", "blue", "white"]).nullable().optional(),
+    color_confirmed: z.boolean().nullable().optional(),
+  })),
   isHost: z.boolean().optional(),
 });
 
