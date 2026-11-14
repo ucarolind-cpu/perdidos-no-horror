@@ -89,6 +89,10 @@ export const memberRoomAction = createServerFn({ method: "POST" })
 export const roomColorAction = createServerFn({ method: "POST" })
   .inputValidator((input) => roomColorActionSchema.parse(input))
   .handler(async ({ data }) => {
+    if (data.action === "confirm" && !data.roomId) {
+      throw new Error("Entre em uma sala multiplayer antes de confirmar sua cor.");
+    }
+
     const secretHash = await hashSecret(data.device.secret);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
@@ -109,22 +113,27 @@ export const roomColorAction = createServerFn({ method: "POST" })
 
       const playerId = registeredDevice.id;
       const roomId = data.roomId;
-      const selectedColor = data.color;
+      const corEscolhida = data.color;
 
-      const { error: saveError } = await (supabaseAdmin as any).rpc("salvar_cor_jogador", {
+      const { error } = await (supabaseAdmin as any).rpc("salvar_cor_jogador", {
         p_device_id: playerId,
         p_room_id: roomId,
-        p_color: selectedColor,
+        p_color: corEscolhida,
       });
 
-      if (saveError) {
+      if (error) {
         console.error("[Rooms] salvar_cor_jogador failed:", {
-          code: saveError.code,
-          message: saveError.message,
-          details: saveError.details,
-          hint: saveError.hint,
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
         });
-        throw new Error(`Erro Supabase ${saveError.code ?? ""}: ${saveError.message}`.trim());
+
+        if (error.code === "23505") {
+          throw new Error("Esta cor já foi escolhida por outro jogador. Escolha outra.");
+        }
+
+        throw new Error(`Erro Supabase ${error.code ?? ""}: ${error.message}`.trim());
       }
     }
 
