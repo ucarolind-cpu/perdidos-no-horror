@@ -9,6 +9,10 @@ export function RoomLiveSync() {
   const { saved } = useRoomState();
   const { refresh } = useRoomActions();
   const navigate = useNavigate();
+  const refreshRef = useRef(refresh);
+  const navigateRef = useRef(navigate);
+  refreshRef.current = refresh;
+  navigateRef.current = navigate;
   const topic = saved?.room.realtime_topic;
   const roomId = saved?.room.id;
   const playersRef = useRef(saved?.players ?? []);
@@ -29,10 +33,10 @@ export function RoomLiveSync() {
       if (checking) { again = true; return; }
       checking = true;
       try {
-        if (!await refresh() && active) {
+        if (!await refreshRef.current() && active) {
           active = false;
           closeRemoteRoom();
-          await navigate({ to: "/multijogador" });
+          await navigateRef.current({ to: "/multijogador" });
         }
       } catch {
         // The periodic heartbeat retries transient network failures.
@@ -115,7 +119,7 @@ export function RoomLiveSync() {
       document.removeEventListener("visibilitychange", focus);
       void supabase.removeChannel(channel);
     };
-  }, [topic, roomId, refresh, navigate]);
+  }, [topic, roomId]);
 
   return null;
 }
