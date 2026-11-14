@@ -1,4 +1,4 @@
-// Lovable deploy refresh marker: room color persistence RPC is wired in rooms.functions.ts.
+// Lovable deploy refresh marker: verify room_players.player_color persistence in the latest preview.
 // Deploy trigger: verify the latest player_color persistence code in Lovable Preview.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FadeInFromBlack } from "@/game/DoorTransition";
